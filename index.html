@@ -1951,23 +1951,151 @@ window.render('todas', Infinity);
 /* ── CHATBOT ENGINE ── */
 const CHAT_WA = WA_NUMERO; // usa el mismo número ya definido arriba
 
-const CHAT_SYSTEM = `Eres el asistente de Caravanas Sur, negocio familiar que compra caravanas en Francia (zona Ruffec/Charente) y las vende en Málaga y Granada. El dueño se llama Laurent, francés viviendo en Málaga 20 años.
+/* ── FAQ ENGINE — respuestas por palabras clave ── */
+const CHAT_WA = WA_NUMERO;
 
-CATÁLOGO ACTUAL:
-${CARAVANAS.map(c=>`- ${c.marca} (${c.año}): ${c.precio.toLocaleString('es-ES')} € — ${c.estado} — ${c.plazas} plazas ${c.peso} — ${c.extras.join(', ')}`).join('\n')}
+const FAQ = [
+  {
+    keys: ['itv','técnica','inspeccion','inspección','papeles','documentacion','documentación','trámite','tramite'],
+    resp: 'No necesitan ITV propia. Todas nuestras caravanas son menos de 750 kg — en España se consideran remolque ligero y no requieren inspección técnica. Solo necesitas el contrato de compraventa y la documentación francesa.',
+    wa: false
+  },
+  {
+    keys: ['precio','cuesta','vale','cuanto','cuánto','coste','costar','económic','barata','barato'],
+    resp: () => {
+      const disp = CARAVANAS.filter(c=>c.estado==='disponible');
+      const min = Math.min(...disp.map(c=>c.precio));
+      const max = Math.max(...disp.map(c=>c.precio));
+      return `Ahora mismo tenemos ${disp.length} caravanas disponibles, desde ${min.toLocaleString('es-ES')} € hasta ${max.toLocaleString('es-ES')} €. El precio depende del modelo, año y equipamiento. ¿Tienes un presupuesto en mente?`;
+    },
+    wa: false
+  },
+  {
+    keys: ['disponible','disponibles','stock','tienes','tenéis','teneis','catálogo','catalogo','hay','cuales','cuáles'],
+    resp: () => {
+      const disp = CARAVANAS.filter(c=>c.estado==='disponible');
+      return `Tenemos ${disp.length} caravanas disponibles ahora mismo:\n${disp.map(c=>`• ${c.marca} (${c.año}) — ${c.precio.toLocaleString('es-ES')} €`).join('\n')}\n¿Alguna te interesa?`;
+    },
+    wa: false
+  },
+  {
+    keys: ['reserv','señal','apartar','acompte','deposito','depósito','pagar','pago'],
+    resp: 'Para reservar pedimos 200 € de señal por Bizum o transferencia. Esa cantidad se descuenta del precio final. Es completamente reembolsable si la caravana no está en el estado descrito cuando voy a buscarla a Francia.',
+    wa: false
+  },
+  {
+    keys: ['entrega','entregar','llevar','llevo','traer','traéis','traeis','recibir','recog'],
+    resp: 'La entrega es gratuita en Málaga capital, Rincón de la Victoria, Vélez-Málaga, Nerja, Torre del Mar, Axarquía, Motril, Almuñécar, Costa Tropical y Granada capital. Para otras zonas lo negociamos.',
+    wa: false
+  },
+  {
+    keys: ['tarda','plazo','tiempo','cuando','cuándo','semana','dias','días'],
+    resp: 'Entre 2 y 4 semanas desde que reservas. Cuando confirmas la señal, te doy la fecha exacta de mi próximo viaje a Francia. Siempre sabes cuándo llega antes de pagar nada.',
+    wa: false
+  },
+  {
+    keys: ['granada','motril','almuñecar','almunecar','costa tropical','salobreña'],
+    resp: 'Sí, entregamos gratis en toda la Costa Tropical granadina (Motril, Almuñécar, Salobreña) y en Granada capital. Es una de nuestras zonas principales.',
+    wa: false
+  },
+  {
+    keys: ['málaga','malaga','rincon','rincón','velez','vélez','nerja','torre del mar','axarquia','axarquía'],
+    resp: 'Sí, entregamos gratis en toda la Axarquía y Málaga capital — es nuestra zona de base. Rincón de la Victoria, Vélez-Málaga, Torre del Mar, Nerja, Torrox...',
+    wa: false
+  },
+  {
+    keys: ['marbella','torremolinos','benalmadena','benalmádena','fuengirola','estepona','ronda','antequera'],
+    resp: 'Esa zona está más alejada de nuestra base. La entrega es posible pero tiene un coste adicional que acordamos antes. Escríbenos y lo vemos.',
+    wa: true
+  },
+  {
+    keys: ['almeria','almería','jaen','jaén','sevilla','cordoba','córdoba','huelva','cadiz','cádiz'],
+    resp: 'Fuera de Málaga y Granada hay un coste de transporte adicional. Escríbenos con tu zona exacta y te damos un precio.',
+    wa: true
+  },
+  {
+    keys: ['hobby'],
+    resp: () => {
+      const c = CARAVANAS.find(c=>c.marca.toLowerCase().includes('hobby'));
+      return c ? `La ${c.marca} (${c.año}) está a ${c.precio.toLocaleString('es-ES')} € — estado: ${c.estado}. ${c.extras.join(', ')}. ¿Quieres más detalles?` : 'Ahora mismo no tenemos Hobby disponible, pero suelen aparecer con frecuencia. Déjame tu contacto en el formulario de "avísame" y te escribo cuando llegue una.';
+    },
+    wa: false
+  },
+  {
+    keys: ['adria'],
+    resp: () => {
+      const c = CARAVANAS.find(c=>c.marca.toLowerCase().includes('adria'));
+      return c ? `La ${c.marca} (${c.año}) está a ${c.precio.toLocaleString('es-ES')} € — estado: ${c.estado}. ${c.extras.join(', ')}.` : 'No tenemos Adria ahora mismo. Apúntate en el formulario de avísame y te contacto cuando llegue una.';
+    },
+    wa: false
+  },
+  {
+    keys: ['fendt'],
+    resp: () => {
+      const c = CARAVANAS.find(c=>c.marca.toLowerCase().includes('fendt'));
+      return c ? `La ${c.marca} (${c.año}) está a ${c.precio.toLocaleString('es-ES')} € — la mejor del catálogo. ${c.extras.join(', ')}. Estado: ${c.estado}.` : 'No hay Fendt disponible ahora. Es la marca más buscada — apúntate en el formulario y avisamos en cuanto llegue.';
+    },
+    wa: false
+  },
+  {
+    keys: ['knaus'],
+    resp: () => {
+      const c = CARAVANAS.find(c=>c.marca.toLowerCase().includes('knaus'));
+      return c ? `La ${c.marca} (${c.año}) a ${c.precio.toLocaleString('es-ES')} €. Estado: ${c.estado}. Incluye: ${c.extras.join(', ')}.` : 'No hay Knaus en este momento. Déjame tu contacto en el formulario de avísame.';
+    },
+    wa: false
+  },
+  {
+    keys: ['garantia','garantía','averia','avería','problema','fallo','roto'],
+    resp: 'Es segunda mano comprada a particular, no hay garantía legal. Pero antes de bajarla la reviso personalmente: humedad, suelo, chasis, nevera y documentación. Si oculto algún defecto que encuentres en la entrega, lo resuelvo.',
+    wa: false
+  },
+  {
+    keys: ['humedad','goteras','moho','blanda','blando','suelo'],
+    resp: 'La humedad es lo primero que revisamos. Usamos medidor de humedad en paredes y suelo. Si detectamos algo significativo, no la compramos. Si alguna llega con un problema que no declaramos, es responsabilidad nuestra.',
+    wa: false
+  },
+  {
+    keys: ['francias','france','francesa','vender','vendedores','comprar en','leboncoin','ruffec','charente'],
+    resp: 'Compramos directamente en la zona de Ruffec y Charente (Francia). Si tienes una caravana para vender en Francia, ve a la sección "Vous vendez une caravane ?" en nuestra web.',
+    wa: false
+  },
+  {
+    keys: ['peso','kg','kilo','750','remolque','carnet','carné','b','licencia'],
+    resp: 'Todas nuestras caravanas pesan menos de 750 kg. Con carnet de conducir tipo B puedes arrastrarlas sin restricciones adicionales en España. No necesitas carnet especial.',
+    wa: false
+  },
+  {
+    keys: ['solar','panel','energia','energía','bateria','batería','electricidad'],
+    resp: 'Algunas unidades incluyen panel solar — mira los extras de cada caravana en el catálogo. Te lo indico en la ficha de cada una.',
+    wa: false
+  },
+  {
+    keys: ['hola','buenas','buenos','hi','hello','bonjour','salut'],
+    resp: '¡Hola! Puedo ayudarte con precios, disponibilidad, zonas de entrega, la reserva o cualquier duda sobre nuestras caravanas. ¿Qué necesitas?',
+    wa: false
+  },
+  {
+    keys: ['gracias','perfecto','genial','ok','vale','entendido','merci'],
+    resp: 'De nada 😊 Si tienes más preguntas o quieres ver alguna caravana en detalle, aquí estoy.',
+    wa: false
+  },
+];
 
-REGLAS:
-- Responde en español (o francés si el usuario escribe en francés)
-- Máximo 3 frases por respuesta, directo y amable
-- Si preguntan precio → da el precio exacto del catálogo
-- Entrega GRATUITA: Rincón de la Victoria, Vélez-Málaga, Nerja, Torre del Mar, Axarquía, Málaga capital, Motril, Almuñécar, Costa Tropical, Granada capital
-- Zonas lejanas (Marbella, Ronda, Alpujarras...): se negocia por WhatsApp
-- Todas < 750 kg → NO necesitan ITV propia en España
-- Señal de reserva: 200 € (reembolsable si no está en el estado descrito)
-- Si no sabes algo o el cliente quiere comprar → incluye exactamente: [WA]
-- NO inventes caravanas fuera del catálogo`;
+// Fallback cuando no encuentra respuesta
+const FALLBACK = { resp: 'No tengo esa información exacta. Para no darte un dato incorrecto, te paso con Laurent directamente.', wa: true };
 
-const chatMsgs = [];
+function faqResponde(txt) {
+  const q = txt.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  for (const f of FAQ) {
+    if (f.keys.some(k => q.includes(k.normalize('NFD').replace(/[\u0300-\u036f]/g,'')))) {
+      const resp = typeof f.resp === 'function' ? f.resp() : f.resp;
+      return { resp, wa: f.wa };
+    }
+  }
+  return FALLBACK;
+}
+
 let chatBusy = false;
 
 const msgsEl  = document.getElementById('chat-msgs');
@@ -1984,17 +2112,14 @@ function hora() {
   return new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
 }
 
-function addMsg(role, text, forceWA=false) {
-  const showWA = forceWA || text.includes('[WA]');
-  const clean  = text.replace('[WA]','').trim();
-
-  const wrap   = document.createElement('div');
+function addMsg(role, text, showWA=false) {
+  const wrap = document.createElement('div');
   wrap.className = `cmsg ${role==='user'?'usr':'bot'}`;
-
   const bub = document.createElement('div');
   bub.className = 'cbubble';
-  bub.textContent = clean;
-
+  // Preservar saltos de línea
+  bub.style.whiteSpace = 'pre-line';
+  bub.textContent = text;
   if (showWA) {
     const a = document.createElement('a');
     a.className = 'btn-chat-wa';
@@ -2004,11 +2129,9 @@ function addMsg(role, text, forceWA=false) {
     bub.appendChild(document.createElement('br'));
     bub.appendChild(a);
   }
-
   const t = document.createElement('span');
   t.className = 'ctime';
   t.textContent = hora();
-
   wrap.appendChild(bub);
   wrap.appendChild(t);
   msgsEl.appendChild(wrap);
@@ -2024,37 +2147,20 @@ function showTyping() {
 }
 function hideTyping() { document.getElementById('chat-typing')?.remove(); }
 
-async function enviar(txt) {
+function enviar(txt) {
   if (!txt || chatBusy) return;
   chatBusy = true; sendEl.disabled = true;
   sugsEl.style.display = 'none';
-
-  chatMsgs.push({role:'user', content:txt});
   addMsg('user', txt);
   showTyping();
 
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
-        max_tokens:300,
-        system: CHAT_SYSTEM,
-        messages: chatMsgs
-      })
-    });
-    const data = await res.json();
-    const reply = data?.content?.[0]?.text || '[WA]';
+  // Simular pequeño delay natural
+  setTimeout(() => {
     hideTyping();
-    chatMsgs.push({role:'assistant', content:reply});
-    addMsg('bot', reply);
-  } catch(e) {
-    hideTyping();
-    addMsg('bot', 'No puedo responderte ahora mismo. Escríbenos directamente.', true);
-  }
-
-  chatBusy = false; sendEl.disabled = false; inputEl.focus();
+    const { resp, wa } = faqResponde(txt);
+    addMsg('bot', resp, wa);
+    chatBusy = false; sendEl.disabled = false; inputEl.focus();
+  }, 600);
 }
 
 // Toggle
@@ -2063,7 +2169,7 @@ togEl.addEventListener('click', () => {
   winEl.classList.toggle('visible');
   togEl.classList.toggle('open');
   notifEl.style.display = 'none';
-  if (!wasOpen && chatMsgs.length === 0) {
+  if (!wasOpen && msgsEl.children.length === 0) {
     setTimeout(() => addMsg('bot', '¡Hola! 👋 Soy el asistente de Caravanas Sur. Pregúntame sobre precios, disponibilidad, entrega o cómo reservar.'), 250);
   }
 });
