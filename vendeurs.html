@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caravanas Sur — Nous achetons votre caravane</title>
+<meta name="description" content="Nous achetons des caravanes d'occasion en Charente et Nouvelle-Aquitaine pour les revendre en Espagne. Paiement rapide, enlèvement garanti, pas d'intermédiaire.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F2EC;
+    --bg2: #EDEAE2;
+    --card: #FFFEF9;
+    --ink: #1C1A16;
+    --ink2: #6B6760;
+    --ink3: #A09D98;
+    --accent: #C85B2A;
+    --green: #1D9E75;
+    --border: rgba(28,26,22,0.10);
+    --radius: 12px;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+  a { color: inherit; text-decoration: none; }
+
+  /* HEADER */
+  header {
+    padding: 1.4rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    background: var(--card);
+  }
+  .logo { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; }
+  .logo span { color: var(--accent); }
+  .logo-sub { font-size: 11px; color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+  .lang-switch {
+    font-size: 12px; color: var(--ink3); border: 1px solid var(--border);
+    padding: 5px 12px; border-radius: 100px; transition: all 0.15s;
+  }
+  .lang-switch:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* HERO */
+  .hero {
+    padding: 3.5rem 2rem 3rem;
+    background: linear-gradient(135deg, #1C1A16 0%, #2D2A24 100%);
+    color: #fff;
+  }
+  .hero-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); margin-bottom: 1rem;
+  }
+  .hero-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .hero h1 {
+    font-family: var(--serif); font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 600; line-height: 1.15; letter-spacing: -0.03em;
+    margin-bottom: 1rem; max-width: 600px;
+  }
+  .hero h1 em { color: #C8A97A; font-style: normal; }
+  .hero p { color: rgba(255,255,255,0.75); font-size: 16px; max-width: 520px; margin-bottom: 2rem; line-height: 1.7; }
+  .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #25D366; color: #fff;
+    padding: 12px 22px; border-radius: 8px;
+    font-size: 15px; font-weight: 500;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary svg { width: 18px; height: 18px; fill: #fff; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.1); color: #fff;
+    padding: 12px 22px; border-radius: 8px;
+    font-size: 15px; border: 1px solid rgba(255,255,255,0.2);
+    transition: background 0.15s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.18); }
+
+  /* QUI SOMMES-NOUS */
+  .qui {
+    padding: 3rem 2rem;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;
+  }
+  .qui h2 { font-family: var(--serif); font-size: 1.7rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  .qui h2 em { color: var(--accent); font-style: normal; }
+  .qui p { font-size: 14px; color: var(--ink2); line-height: 1.8; margin-bottom: 1rem; }
+  .qui-stats { display: flex; gap: 1.5rem; margin-top: 1.5rem; }
+  .stat { text-align: center; }
+  .stat-num { font-family: var(--serif); font-size: 2rem; font-weight: 600; color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--ink3); margin-top: 2px; }
+  .qui-visual {
+    background: var(--bg2); border-radius: 16px; padding: 2rem;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .route-step {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 13px; color: var(--ink2);
+  }
+  .route-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .route-arrow { text-align: center; color: var(--ink3); font-size: 18px; padding-left: 11px; }
+
+  /* COMMENT ÇA MARCHE */
+  .process {
+    padding: 3rem 2rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .process h2 { font-family: var(--serif); font-size: 1.7rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .process h2 em { color: var(--accent); font-style: normal; }
+  .process .sub { font-size: 14px; color: var(--ink3); margin-bottom: 2rem; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .step {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem;
+  }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .step-title { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .step-desc { font-size: 12px; color: var(--ink2); line-height: 1.6; }
+  .step-tag {
+    display: inline-block; margin-top: 10px;
+    font-size: 11px; padding: 2px 8px; border-radius: 4px;
+    background: #D4EDDF; color: #1A5C33;
+  }
+
+  /* CE QU'ON CHERCHE */
+  .cherche {
+    padding: 3rem 2rem;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .cherche h2 { font-family: var(--serif); font-size: 1.7rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .cherche h2 em { color: var(--accent); font-style: normal; }
+  .cherche .sub { font-size: 14px; color: var(--ink3); margin-bottom: 2rem; }
+  .criteres { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .critere {
+    padding: 1rem 1.2rem; border-radius: var(--radius);
+    border: 1px solid var(--border); background: var(--bg);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .critere-icon { font-size: 20px; flex-shrink: 0; }
+  .critere-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+  .critere-desc { font-size: 12px; color: var(--ink2); line-height: 1.5; }
+  .non-voulu {
+    margin-top: 1.2rem; padding: 1rem 1.2rem;
+    background: #FFF5F5; border: 1px solid #FECACA;
+    border-radius: var(--radius); font-size: 13px; color: #7F1D1D;
+    display: flex; gap: 10px;
+  }
+
+  /* FORMULAIRE */
+  .formulaire {
+    padding: 3rem 2rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+  }
+  .formulaire h2 { font-family: var(--serif); font-size: 1.7rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .formulaire h2 em { color: var(--accent); font-style: normal; }
+  .formulaire .sub { font-size: 14px; color: var(--ink3); margin-bottom: 2rem; }
+  .form-box {
+    max-width: 580px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 16px; padding: 2rem;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-field { display: flex; flex-direction: column; gap: 4px; }
+  .form-label { font-size: 12px; color: var(--ink3); }
+  .form-req { color: var(--accent); }
+  .form-input {
+    padding: 9px 12px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--ink); font-family: var(--sans); font-size: 14px;
+    outline: none; transition: border-color 0.15s; width: 100%; resize: vertical;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--ink3); }
+  .form-input.error { border-color: var(--accent); }
+  .btn-form {
+    width: 100%; padding: 12px; border-radius: 8px;
+    background: var(--accent); color: #fff; border: none;
+    font-family: var(--sans); font-size: 15px; font-weight: 500;
+    cursor: pointer; transition: opacity 0.15s; margin-top: 4px;
+  }
+  .btn-form:hover { opacity: 0.88; }
+  .form-ok {
+    display: none; text-align: center; padding: 2rem 1rem;
+  }
+  .form-ok .tick { font-size: 40px; margin-bottom: 10px; }
+  .form-ok p { font-size: 14px; color: var(--ink2); line-height: 1.7; }
+  .form-disclaimer { font-size: 11px; color: var(--ink3); text-align: center; margin-top: 10px; }
+
+  /* FOOTER */
+  footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    font-size: 12px; color: var(--ink3); background: var(--card);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    header, .hero, .qui, .process, .cherche, .formulaire, footer { padding-left: 1.2rem; padding-right: 1.2rem; }
+    .qui { grid-template-columns: 1fr; gap: 2rem; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .criteres { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Caravanas<span>Sur</span></div>
+    <div class="logo-sub">Acheteurs de caravanes · Espagne</div>
+  </div>
+  <a class="lang-switch" href="index.html">🇪🇸 Ver en español</a>
+</header>
+
+<section class="hero">
+  <div class="hero-label"><span class="hero-dot"></span> Acheteur professionnel · Charente & Nouvelle-Aquitaine</div>
+  <h1>Nous achetons votre<br>caravane <em>au juste prix</em></h1>
+  <p>Basés en Espagne, nous achetons régulièrement des caravanes d'occasion dans la région de Ruffec et toute la Nouvelle-Aquitaine pour les revendre sur la Costa del Sol. Enlèvement garanti, paiement rapide, zéro commission.</p>
+  <div class="hero-btns">
+    <a class="btn-primary" id="wa-hero" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Nous contacter sur WhatsApp
+    </a>
+    <a class="btn-secondary" href="#formulaire">Décrire ma caravane ↓</a>
+  </div>
+</section>
+
+<section class="qui">
+  <div>
+    <h2>Qui sommes-<em>nous</em> ?</h2>
+    <p>Nous sommes une famille franco-espagnole basée à Rincón de la Victoria (Málaga). Nous venons régulièrement à Ruffec rendre visite à nos parents, et nous en profitons pour acheter des caravanes d'occasion dans la région.</p>
+    <p>Nous revendons ensuite ces caravanes en Andalousie, où la demande est forte et l'offre limitée. Ce n'est pas un grand négoce — c'est une activité familiale, sérieuse et transparente.</p>
+    <p>Nous connaissons bien la région de Charente, nous parlons français couramment, et nous payons par virement bancaire dès l'accord conclu.</p>
+    <div class="qui-stats">
+      <div class="stat">
+        <div class="stat-num">< 750</div>
+        <div class="stat-label">kg idéalement</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">24h</div>
+        <div class="stat-label">délai de réponse</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0 €</div>
+        <div class="stat-label">de commission</div>
+      </div>
+    </div>
+  </div>
+  <div class="qui-visual">
+    <div class="route-step">
+      <div class="route-icon">📍</div>
+      <div><strong>Ruffec / Charente</strong><br><span style="font-size:12px;color:var(--ink3)">Achat de la caravane</span></div>
+    </div>
+    <div class="route-arrow">↓</div>
+    <div class="route-step">
+      <div class="route-icon">🚗</div>
+      <div><strong>Route via l'Espagne</strong><br><span style="font-size:12px;color:var(--ink3)">Nous la descendons nous-mêmes</span></div>
+    </div>
+    <div class="route-arrow">↓</div>
+    <div class="route-step">
+      <div class="route-icon">☀️</div>
+      <div><strong>Málaga / Granada</strong><br><span style="font-size:12px;color:var(--ink3)">Revente en Andalousie</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="process">
+  <h2>Comment <em>ça marche</em> ?</h2>
+  <p class="sub">Simple, rapide, sans mauvaise surprise</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Vous nous contactez</div>
+      <div class="step-desc">Par WhatsApp ou via le formulaire ci-dessous. Envoyez-nous quelques photos et le prix demandé.</div>
+      <span class="step-tag">sous 24h</span>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">On se met d'accord</div>
+      <div class="step-desc">On discute du prix directement, sans intermédiaire. Si ça nous convient, on réserve avec 200 € d'acompte par virement.</div>
+      <span class="step-tag">prix ferme</span>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">On vient la chercher</div>
+      <div class="step-desc">On passe à Ruffec lors de notre prochain voyage (2 à 4 semaines). On inspecte sur place et on emporte si tout va bien.</div>
+      <span class="step-tag">enlèvement garanti</span>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">Paiement complet</div>
+      <div class="step-desc">Le solde est payé par virement au moment de l'enlèvement. Pas de chèque, pas d'espèces — virement bancaire uniquement.</div>
+      <span class="step-tag">sécurisé</span>
+    </div>
+  </div>
+</section>
+
+<section class="cherche">
+  <h2>Ce qu'on <em>recherche</em></h2>
+  <p class="sub">Nos critères d'achat habituels — mais contactez-nous même si votre caravane ne correspond pas exactement</p>
+  <div class="criteres">
+    <div class="critere">
+      <div class="critere-icon">⚖️</div>
+      <div>
+        <div class="critere-title">Poids inférieur à 750 kg (PTAC)</div>
+        <div class="critere-desc">C'est notre priorité. Ces caravanes ne nécessitent pas de contrôle technique en Espagne, ce qui facilite la revente.</div>
+      </div>
+    </div>
+    <div class="critere">
+      <div class="critere-icon">📅</div>
+      <div>
+        <div class="critere-title">Années 1998 à 2015</div>
+        <div class="critere-desc">Nous achetons des modèles de toutes marques : Adria, Hobby, Knaus, Bürstner, Fendt, Caravelair, Trigano...</div>
+      </div>
+    </div>
+    <div class="critere">
+      <div class="critere-icon">💧</div>
+      <div>
+        <div class="critere-title">Sans humidité importante</div>
+        <div class="critere-desc">Nous vérifions systématiquement avec un hygromètre. Quelques traces légères sont acceptables, mais pas de murs gorgés d'eau.</div>
+      </div>
+    </div>
+    <div class="critere">
+      <div class="critere-icon">📄</div>
+      <div>
+        <div class="critere-title">Avec carte grise</div>
+        <div class="critere-desc">La carte grise (ou les papiers d'origine) est indispensable. Sans document de propriété nous ne pouvons pas acheter.</div>
+      </div>
+    </div>
+    <div class="critere">
+      <div class="critere-icon">💶</div>
+      <div>
+        <div class="critere-title">Budget d'achat 800 € à 8.000 €</div>
+        <div class="critere-desc">Nous achetons dans cette fourchette selon l'état et l'équipement. Plus la caravane est équipée (auvent, store, mover), mieux c'est.</div>
+      </div>
+    </div>
+    <div class="critere">
+      <div class="critere-icon">📍</div>
+      <div>
+        <div class="critere-title">Zone Charente et alentours</div>
+        <div class="critere-desc">Ruffec, Angoulême, Poitiers, Niort, Périgueux, Bordeaux et toute la Nouvelle-Aquitaine. Nous nous déplaçons dans un rayon de 150 km de Ruffec.</div>
+      </div>
+    </div>
+  </div>
+  <div class="non-voulu">
+    <span>⚠️</span>
+    <span><strong>Ce que nous n'achetons pas :</strong> caravanes de plus de 900 kg sans COC européen, épaves, caravanes sans aucun document, ou caravanes avec structure effondrée.</span>
+  </div>
+</section>
+
+<section class="formulaire" id="formulaire">
+  <h2>Décrivez votre <em>caravane</em></h2>
+  <p class="sub">On vous répond dans les 24 heures avec une offre ou un retour honnête</p>
+  <div class="form-box">
+    <div id="vend-form">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="v-nom">Votre prénom <span class="form-req">*</span></label>
+          <input class="form-input" type="text" id="v-nom" placeholder="Jean-Pierre" autocomplete="given-name">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="v-tel">Téléphone / WhatsApp <span class="form-req">*</span></label>
+          <input class="form-input" type="tel" id="v-tel" placeholder="+33 6 00 00 00 00" autocomplete="tel">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="v-marque">Marque et modèle</label>
+          <input class="form-input" type="text" id="v-marque" placeholder="Ex: Hobby 440 SF">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="v-annee">Année</label>
+          <input class="form-input" type="number" id="v-annee" placeholder="Ex: 2006" min="1990" max="2020">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="v-poids">PTAC (poids en kg)</label>
+          <input class="form-input" type="text" id="v-poids" placeholder="Ex: 720 kg">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="v-prix">Prix demandé</label>
+          <input class="form-input" type="text" id="v-prix" placeholder="Ex: 3.500 €">
+        </div>
+      </div>
+      <div class="form-field" style="margin-bottom:12px;">
+        <label class="form-label" for="v-ville">Ville / commune <span class="form-req">*</span></label>
+        <input class="form-input" type="text" id="v-ville" placeholder="Ex: Ruffec (16700)">
+      </div>
+      <div class="form-field" style="margin-bottom:1.2rem;">
+        <label class="form-label" for="v-desc">Description et état général</label>
+        <textarea class="form-input" id="v-desc" rows="3" placeholder="Humidité, équipements, réparations récentes, raison de la vente..."></textarea>
+      </div>
+      <button class="btn-form" id="btn-vend">Envoyer ma description →</button>
+      <p class="form-disclaimer">Vos coordonnées ne seront utilisées que pour vous répondre concernant cette vente.</p>
+    </div>
+    <div class="form-ok" id="vend-ok">
+      <div class="tick">✅</div>
+      <p><strong>Merci, on a bien reçu votre message !</strong><br>
+      On vous répond dans les 24 heures. En attendant, vous pouvez aussi nous écrire directement sur WhatsApp si vous préférez une réponse plus rapide.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Caravanas Sur · Rincón de la Victoria, Málaga (Espagne)</span>
+  <a href="index.html" style="color: var(--accent);">Voir notre catalogue →</a>
+</footer>
+
+<script>
+const WA_NUMERO = "34600000000"; // ← TON NUMÉRO ICI
+const WEBHOOK_URL = "PEGA_AQUI_TU_URL_DE_APPS_SCRIPT"; // ← misma URL que en index.html
+
+const waLink = msg => `https://wa.me/${WA_NUMERO}?text=${encodeURIComponent(msg)}`;
+
+document.getElementById('wa-hero').href = waLink(
+  "Bonjour, je voudrais vous vendre ma caravane. Pouvez-vous me donner plus d'informations ?"
+);
+
+document.getElementById('btn-vend').addEventListener('click', async () => {
+  const nom   = document.getElementById('v-nom').value.trim();
+  const tel   = document.getElementById('v-tel').value.trim();
+  const ville = document.getElementById('v-ville').value.trim();
+
+  if (!nom || !tel || !ville) {
+    if (!nom)   document.getElementById('v-nom').classList.add('error');
+    if (!tel)   document.getElementById('v-tel').classList.add('error');
+    if (!ville) document.getElementById('v-ville').classList.add('error');
+    return;
+  }
+
+  const marque = document.getElementById('v-marque').value.trim();
+  const annee  = document.getElementById('v-annee').value.trim();
+  const poids  = document.getElementById('v-poids').value.trim();
+  const prix   = document.getElementById('v-prix').value.trim();
+  const desc   = document.getElementById('v-desc').value.trim();
+
+  const payload = { tipo: "vendedor", nombre: nom, tel, ville, marque, annee, poids, prix, desc };
+
+  // Enviar al Sheet
+  if (WEBHOOK_URL !== "PEGA_AQUI_TU_URL_DE_APPS_SCRIPT") {
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch(e) { console.warn("Sheet no disponible:", e); }
+  }
+
+  document.getElementById('vend-form').style.display = 'none';
+  document.getElementById('vend-ok').style.display = 'block';
+
+  const msg = [
+    `🚐 *Vendeur potentiel — site web*`,
+    `Prénom : ${nom}`,
+    `Téléphone : ${tel}`,
+    `Commune : ${ville}`,
+    marque ? `Caravane : ${marque}` : '',
+    annee  ? `Année : ${annee}` : '',
+    poids  ? `PTAC : ${poids}` : '',
+    prix   ? `Prix demandé : ${prix}` : '',
+    desc   ? `Description : ${desc}` : '',
+  ].filter(Boolean).join('\n');
+
+  setTimeout(() => window.open(waLink(msg), '_blank'), 900);
+});
+</script>
+</body>
+</html>
