@@ -2068,7 +2068,23 @@ const FAQ = [
     wa: false
   },
   {
-    keys: ['hola','buenas','buenos','hi','hello','bonjour','salut'],
+    keys: ['nueva','nuevas','usado','usada','segunda mano','ocasion','ocasión','km','kilometros','kilómetros','antiguedad','antigüedad'],
+    resp: 'Son caravanas de segunda mano compradas directamente a particulares en Francia. Tienen entre 10 y 25 años pero están revisadas antes de bajarlas — humedad, suelo, mecánica. La mayoría están en muy buen estado de uso.',
+    wa: false
+  },
+  {
+    keys: ['caravana','caravanas','remolque','autocaravana'],
+    resp: () => {
+      const disp = CARAVANAS.filter(c=>c.estado==='disponible');
+      return `Tenemos ${disp.length} caravanas disponibles ahora mismo, desde ${Math.min(...disp.map(c=>c.precio)).toLocaleString('es-ES')} € hasta ${Math.max(...disp.map(c=>c.precio)).toLocaleString('es-ES')} €. Todas menos de 750 kg, sin ITV propia, con documentación francesa incluida. ¿Tienes alguna preferencia de precio o marca?`;
+    },
+    wa: false
+  },
+  {
+    keys: ['comprar','compra','interesa','interesado','quiero','busco','necesito'],
+    resp: 'Genial — cuéntame qué buscas (presupuesto, plazas, uso) y te digo qué tenemos disponible. O si ya tienes una en mente, escríbeme el nombre.',
+    wa: false
+  },
     resp: '¡Hola! Puedo ayudarte con precios, disponibilidad, zonas de entrega, la reserva o cualquier duda sobre nuestras caravanas. ¿Qué necesitas?',
     wa: false
   },
