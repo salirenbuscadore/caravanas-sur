@@ -151,7 +151,18 @@
   .hero h1 em { color: var(--accent); font-style: normal; }
   .hero p { color: var(--ink2); font-size: 15px; max-width: 420px; }
 
-  .filters { padding: 0 2rem 1.5rem; display: flex; gap: 8px; flex-wrap: wrap; }
+  .filters-group {
+    padding: 0 2rem 1.2rem;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .filters-row {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .filters-row-label {
+    font-size: 11px; color: var(--ink3); letter-spacing: 0.08em;
+    text-transform: uppercase; white-space: nowrap;
+    margin-right: 4px;
+  }
   .filter-btn {
     font-family: var(--sans); font-size: 13px; padding: 6px 14px;
     border: 1px solid var(--border); border-radius: 100px;
@@ -519,15 +530,10 @@
   }
 
   /* ── FILTRO MARCAS ── */
-  .filter-sep {
-    width: 1px; height: 20px; background: var(--border);
-    align-self: center; flex-shrink: 0;
-  }
-  .filter-label {
-    font-size: 12px; color: var(--ink3); align-self: center;
-    white-space: nowrap; letter-spacing: 0.04em;
-  }
   .marca-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .marca-btn.proximamente {
+    opacity: 0.55; border-style: dashed;
+  }
 
   /* ── FORMULARIO AVÍSAME ── */
   .avisame-inner { max-width: 600px; }
@@ -855,13 +861,17 @@
   <p>Selección personal de <strong>caravanas de segunda mano compradas directamente en Francia</strong> y entregadas en Málaga y Granada. Todas menos de 750 kg — sin ITV propia, sin burocracia. Revisadas in situ antes de bajar. Documentación francesa incluida.</p>
 </div>
 
-<div class="filters" id="filters-wrap">
-  <button class="filter-btn active" data-filter="todas" data-type="estado">Todas</button>
-  <button class="filter-btn" data-filter="disponible" data-type="estado">Disponibles</button>
-  <button class="filter-btn" data-filter="reservada" data-type="estado">Reservadas</button>
-  <span class="filter-sep" aria-hidden="true"></span>
-  <span class="filter-label">marca:</span>
-  <button class="filter-btn marca-btn" data-filter="todas" data-type="marca">Todas</button>
+<div class="filters-group">
+  <div class="filters-row">
+    <span class="filters-row-label">Estado</span>
+    <button class="filter-btn active" data-filter="todas" data-type="estado">Todas</button>
+    <button class="filter-btn" data-filter="disponible" data-type="estado">Disponibles</button>
+    <button class="filter-btn" data-filter="reservada" data-type="estado">Reservadas</button>
+  </div>
+  <div class="filters-row" id="filters-wrap">
+    <span class="filters-row-label">Marca</span>
+    <button class="filter-btn marca-btn" data-filter="todas" data-type="marca">Todas</button>
+  </div>
 </div>
 
 <div class="price-bar" id="price-bar">
@@ -1347,10 +1357,21 @@ function render(filtro, maxPrecio, marca) {
   }
 
   if (lista.length === 0) {
-    grid.innerHTML = `<div class="empty-state">
-      <div style="font-size:32px;opacity:0.3;">🏕</div>
-      <p>Sin caravanas en este rango.<br>Sube el presupuesto o cambia el filtro.</p>
-    </div>`;
+    const esMarcaProximamente = activaMarca && activaMarca !== 'todas'
+      && !CARAVANAS.some(c => c.marca.split(' ')[0].trim().toLowerCase() === activaMarca.toLowerCase());
+
+    if (esMarcaProximamente) {
+      grid.innerHTML = `<div class="empty-state">
+        <div style="font-size:32px;opacity:0.3;">🏕</div>
+        <p><strong style="color:var(--ink)">${activaMarca}</strong> — todavía no tenemos ninguna en catálogo, pero las traemos con frecuencia desde Francia.<br>
+        Déjanos tu contacto en "¿No encuentras lo que buscas?" más abajo y te avisamos en cuanto llegue una.</p>
+      </div>`;
+    } else {
+      grid.innerHTML = `<div class="empty-state">
+        <div style="font-size:32px;opacity:0.3;">🏕</div>
+        <p>Sin caravanas en este rango.<br>Sube el presupuesto o cambia el filtro.</p>
+      </div>`;
+    }
     countEl.textContent = '0 caravanas';
     return;
   }
@@ -1377,23 +1398,31 @@ document.getElementById('wa-entrega').href =
   `https://wa.me/${WA_NUMERO}?text=${encodeURIComponent('Hola, quería consultar si hacéis entrega en mi zona (Málaga/Granada).')}`;
 
 
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    render(btn.dataset.filter, undefined);
-  });
-});
+/* ── FILTROS POR MARCA (catálogo real + marcas SEO "próximamente") ── */
+const marcasCatalogo = [...new Set(CARAVANAS.map(c => c.marca.split(' ')[0].trim()))];
 
-/* ── FILTROS POR MARCA (generados automáticamente) ── */
-const marcas = [...new Set(CARAVANAS.map(c => c.marca.split(' ')[0].trim()))];
+// Marcas muy buscadas en España que aún no tenemos en stock — SEO + "avísame"
+const MARCAS_SEO = ['Trigano', 'Sterckeman', 'Dethleffs'];
+const marcasExtra = MARCAS_SEO.filter(m => !marcasCatalogo.includes(m));
+
 const filtersWrap = document.getElementById('filters-wrap');
-marcas.forEach(m => {
+
+marcasCatalogo.forEach(m => {
   const btn = document.createElement('button');
   btn.className = 'filter-btn marca-btn';
   btn.dataset.filter = m;
   btn.dataset.type = 'marca';
   btn.textContent = m;
+  filtersWrap.appendChild(btn);
+});
+
+marcasExtra.forEach(m => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn marca-btn proximamente';
+  btn.dataset.filter = m;
+  btn.dataset.type = 'marca';
+  btn.title = `${m} — próximamente, apúntate para que te avisemos`;
+  btn.innerHTML = `${m} <span style="opacity:.6;font-size:11px">· pronto</span>`;
   filtersWrap.appendChild(btn);
 });
 
