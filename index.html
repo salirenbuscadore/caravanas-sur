@@ -1699,49 +1699,7 @@ function initChips(containerId, multiSelect = true) {
 initChips('av-marcas', true);
 initChips('av-extras-chips', true);
 
-/* ── AVÍSAME — formulario completo ── */
-document.getElementById('btn-avisame').addEventListener('click', () => {
-  const email  = document.getElementById('av-email').value.trim();
-  const nombre = document.getElementById('av-nombre').value.trim();
-  const tel    = document.getElementById('av-tel').value.trim();
-  const presup = document.getElementById('av-presupuesto').value;
-  const plazas = document.getElementById('av-plazas').value;
-  const uso    = document.getElementById('av-uso').value;
-  const nota   = document.getElementById('av-nota').value.trim();
-
-  if (!email || !email.includes('@')) {
-    document.getElementById('av-email').classList.add('error');
-    document.getElementById('av-email').focus();
-    return;
-  }
-  document.getElementById('av-email').classList.remove('error');
-
-  const marcasEl   = [...document.querySelectorAll('#av-marcas .chip.selected')].map(c => c.dataset.val);
-  const extrasEl   = [...document.querySelectorAll('#av-extras-chips .chip.selected')].map(c => c.dataset.val);
-
-  // Guarda localmente
-  const leads = JSON.parse(localStorage.getItem('caravanas_leads') || '[]');
-  leads.push({ nombre, email, tel, presup, plazas, uso, marcas: marcasEl, extras: extrasEl, nota, fecha: new Date().toISOString() });
-  localStorage.setItem('caravanas_leads', JSON.stringify(leads));
-
-  // Mensaje WhatsApp completo
-  const lines = [
-    `🚐 *Nueva solicitud desde la web*`,
-    nombre   ? `Nombre: ${nombre}`   : '',
-    `Email: ${email}`,
-    tel      ? `Tel: ${tel}`         : '',
-    presup   ? `Presupuesto: hasta ${Number(presup).toLocaleString('es-ES')} €` : 'Presupuesto: sin límite',
-    plazas   ? `Plazas mínimas: ${plazas}` : '',
-    uso      ? `Uso: ${uso}`         : '',
-    marcasEl.length ? `Marcas: ${marcasEl.join(', ')}` : '',
-    extrasEl.length ? `Extras: ${extrasEl.join(', ')}` : '',
-    nota     ? `Nota: ${nota}`       : '',
-  ].filter(Boolean).join('\n');
-
-  document.getElementById('avisame-form').style.display = 'none';
-  document.getElementById('avisame-ok').classList.add('show');
-  setTimeout(() => window.open(`https://wa.me/${WA_NUMERO}?text=${encodeURIComponent(lines)}`, '_blank'), 800);
-});
+/* ── AVÍSAME — listener unificado arriba ── */
 
 /* ── MODAL SEÑAL ── */
 // Estilos del modal inyectados dinámicamente
@@ -1858,7 +1816,7 @@ function abrirModalSenal(c) {
   });
 
   // Confirmar
-  document.getElementById('btn-senal-confirmar').onclick = () => {
+  document.getElementById('btn-senal-confirmar').onclick = async () => {
     const nombre = document.getElementById('senal-nombre').value.trim();
     const tel    = document.getElementById('senal-tel').value.trim();
     const email  = document.getElementById('senal-email').value.trim();
@@ -1867,6 +1825,21 @@ function abrirModalSenal(c) {
       if (!tel)    document.getElementById('senal-tel').style.borderColor = '#C85B2A';
       return;
     }
+    // Enviar al Sheet
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbxrEA9VLr6Iva6OYuO3Pj4z_3hhgZ35UCgTupElToJFZG3zwynA8VI74eipqkadRae2/exec", {
+        method: "POST", mode: "no-cors",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          tipo: "reserva",
+          nombre, telefono: tel, email: email || "",
+          caravana: c.marca + " " + c.año,
+          precio: c.precio,
+          fecha: new Date().toLocaleString("es-ES")
+        })
+      });
+    } catch(e) { console.warn("Sheet no disponible:", e); }
+
     document.getElementById('modal-form-wrap').style.display = 'none';
     document.getElementById('modal-ok').style.display = 'block';
 
