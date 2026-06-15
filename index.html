@@ -842,6 +842,124 @@
     #chat-toggle{right:16px;bottom:16px;}
     .chat-notif{right:16px;}
   }
+
+/* ── BLOQUE CONTACTO ── */
+.contact-section {
+  padding: 3rem 1.5rem;
+  background: #f7f5f0;
+}
+.contact-section-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.section-label-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.75rem;
+}
+.section-label-line::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 1.5px;
+  background: #888;
+}
+.section-label-line span {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+}
+.contact-hero-text {
+  margin-bottom: 2rem;
+}
+.contact-hero-text h2 {
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+.contact-hero-text p {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.6;
+}
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+.contact-card {
+  border-radius: 16px;
+  padding: 1.25rem 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.cc-green  { background: #E1F5EE; }
+.cc-purple { background: #EEEDFE; }
+.cc-amber  { background: #FAEEDA; }
+.cc-dark   { background: #2C2C2A; }
+
+.cc-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cc-green  .cc-icon { background: #9FE1CB; color: #085041; }
+.cc-purple .cc-icon { background: #CECBF6; color: #3C3489; }
+.cc-amber  .cc-icon { background: #FAC775; color: #633806; }
+.cc-dark   .cc-icon { background: #444441; color: #D3D1C7; }
+
+.cc-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 20px;
+  width: fit-content;
+}
+.cc-green  .cc-badge { background: #9FE1CB; color: #085041; }
+.cc-purple .cc-badge { background: #CECBF6; color: #3C3489; }
+.cc-amber  .cc-badge { background: #FAC775; color: #633806; }
+.cc-dark   .cc-badge { background: #444441; color: #D3D1C7; }
+
+.cc-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.cc-green .cc-title, .cc-purple .cc-title, .cc-amber .cc-title { color: #1a1a1a; }
+.cc-dark  .cc-title { color: #F1EFE8; }
+
+.cc-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  flex: 1;
+}
+.cc-green .cc-desc, .cc-purple .cc-desc, .cc-amber .cc-desc { color: #555; }
+.cc-dark  .cc-desc { color: #B4B2A9; }
+
+.cc-link {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 4px;
+}
+.cc-green  .cc-link { color: #085041; }
+.cc-purple .cc-link { color: #3C3489; }
+.cc-amber  .cc-link { color: #633806; }
+.cc-dark   .cc-link { color: #F1EFE8; }
+.cc-link:hover { opacity: 0.75; }
+
+@media (max-width: 480px) {
+  .contact-cards { grid-template-columns: 1fr 1fr; }
+}
 </style>
 </head>
 <body>
@@ -1101,6 +1219,46 @@
   <h2>Preguntas frecuentes</h2>
   <p class="sub">Todo lo que necesitas saber antes de comprar</p>
   <div class="faq-list" id="faq-list"></div>
+</section>
+
+<section class="contact-section">
+  <div class="contact-section-inner">
+    <div class="contact-hero-text">
+      <div class="section-label-line"><span>Contacto</span></div>
+      <h2>¿Tienes dudas? Hablamos<br>como prefieras.</h2>
+      <p>WhatsApp, llamada, email o visita. Respuesta rápida, sin rodeos.</p>
+    </div>
+    <div class="contact-cards">
+      <div class="contact-card cc-green">
+        <div class="cc-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.862L.057 23.143a.75.75 0 00.921.921l5.281-1.476A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.95 9.95 0 01-5.187-1.453l-.371-.22-3.853 1.078 1.078-3.853-.22-.371A9.95 9.95 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg></div>
+        <span class="cc-badge">En minutos</span>
+        <p class="cc-title">WhatsApp</p>
+        <p class="cc-desc">El canal más rápido. Escríbenos y seguimos por el mismo hilo.</p>
+        <a class="cc-link" href="https://wa.me/34600000000" target="_blank" rel="noopener">Abrir WhatsApp →</a>
+      </div>
+      <div class="contact-card cc-purple">
+        <div class="cc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.09a16 16 0 006 6l1.27-.85a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+        <span class="cc-badge">Tú eliges la hora</span>
+        <p class="cc-title">Llamada</p>
+        <p class="cc-desc">Te llamo cuando mejor te venga. Con un par de datos basta.</p>
+        <a class="cc-link" href="https://wa.me/34600000000?text=Hola%2C%20quiero%20que%20me%20llam%C3%A9is" target="_blank" rel="noopener">Pedir llamada →</a>
+      </div>
+      <div class="contact-card cc-amber">
+        <div class="cc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <span class="cc-badge">Mismo día</span>
+        <p class="cc-title">Email</p>
+        <p class="cc-desc">Para presupuestos, documentación o consultas sin prisa.</p>
+        <a class="cc-link" href="mailto:hola@caravanassur.es">Escribir email →</a>
+      </div>
+      <div class="contact-card cc-dark">
+        <div class="cc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <span class="cc-badge">Con cita previa</span>
+        <p class="cc-title">Visita</p>
+        <p class="cc-desc">Rincón de la Victoria, Málaga. Ven a ver las unidades en persona.</p>
+        <a class="cc-link" href="https://maps.google.com/?q=Rincon+de+la+Victoria+Malaga" target="_blank" rel="noopener">Ver ubicación →</a>
+      </div>
+    </div>
+  </div>
 </section>
 
 <footer>
