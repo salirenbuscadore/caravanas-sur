@@ -1,7 +1,3 @@
 name = "caravanas-sur"
 compatibility_date = "2024-01-01"
 main = "_worker.js"
-
-[[kv_namespaces]]
-binding = "CARAVANAS_KV"
-id = "9453774670904df697495d5cee978196"
