@@ -279,6 +279,28 @@
   .footer-brand span { color: #E8956D; }
   .footer-desc { font-size: 12px; color: #9E9C96; max-width: 340px; line-height: 1.6; }
   .footer-legal { font-size: 11px; color: #6E6C67; margin-top: 4px; }
+  .footer-contact-form { margin-top: 1rem; }
+  .footer-contact-title { font-size: 12px; color: #9E9C96; margin: 0 0 8px; }
+  .footer-form-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .footer-input {
+    flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06); color: #F1EFE8; font-size: 12px; outline: none;
+  }
+  .footer-input::placeholder { color: #6E6C67; }
+  .footer-input:focus { border-color: rgba(255,255,255,0.25); }
+  .footer-textarea {
+    width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06); color: #F1EFE8; font-size: 12px; outline: none;
+    resize: vertical; min-height: 70px; box-sizing: border-box; font-family: inherit;
+  }
+  .footer-textarea::placeholder { color: #6E6C67; }
+  .footer-textarea:focus { border-color: rgba(255,255,255,0.25); }
+  .footer-btn {
+    margin-top: 8px; padding: 8px 18px; border-radius: 8px; border: none;
+    background: #E8956D; color: #fff; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .footer-btn:hover { opacity: 0.85; }
   .footer-social { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
   .footer-social-title { font-size: 11px; color: #9E9C96; letter-spacing: 0.06em; text-transform: uppercase; }
   .social-links { display: flex; gap: 8px; }
@@ -1267,7 +1289,17 @@
   <div class="footer-left">
     <div class="footer-brand">Caravanas<span>Sur</span></div>
     <p class="footer-desc">Caravanas francesas de ocasión en Andalucía. Entrega en Málaga y Granada. Todas &lt; 750 kg, sin ITV propia, documentación incluida.</p>
-    <span class="footer-legal">© 2026 Caravanas Sur · Diseño y concepto <a href="https://salirenbuscadores.com" target="_blank" rel="noopener" style="color:#9E9C96;text-decoration:none;">SalirenBuscadores</a> · Hecho con Claude, Cloudflare &amp; GitHub</span>
+    <span class="footer-legal">© 2026 Caravanas Sur · Diseño y concepto SalirenBuscadores · Hecho con Claude, Cloudflare &amp; GitHub</span>
+    <div class="footer-contact-form">
+      <p class="footer-contact-title">¿Tienes alguna pregunta?</p>
+      <div class="footer-form-row">
+        <input type="text" id="fc-nombre" placeholder="Nombre" class="footer-input">
+        <input type="email" id="fc-email" placeholder="Email" class="footer-input">
+      </div>
+      <textarea id="fc-mensaje" placeholder="Mensaje..." class="footer-textarea"></textarea>
+      <button id="fc-btn" class="footer-btn" onclick="enviarContacto()">Enviar →</button>
+      <p id="fc-ok" style="display:none;font-size:12px;color:#9FE1CB;margin-top:6px;">✓ Mensaje recibido, te respondemos pronto.</p>
+    </div>
   </div>
   <div class="footer-social">
     <span class="footer-social-title">Síguenos</span>
@@ -2484,6 +2516,27 @@ async function enviarLlamada() {
 document.getElementById('modal-llamada').addEventListener('click', function(e) {
   if (e.target === this) this.style.display = 'none';
 });
+
+async function enviarContacto() {
+  var nombre  = document.getElementById('fc-nombre').value.trim();
+  var email   = document.getElementById('fc-email').value.trim();
+  var mensaje = document.getElementById('fc-mensaje').value.trim();
+  if (!nombre || !email || !mensaje) return;
+  var btn = document.getElementById('fc-btn');
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ tipo: 'contacto', nombre, email, mensaje, fecha: new Date().toLocaleString('es-ES') })
+    });
+  } catch(e) {}
+  document.getElementById('fc-ok').style.display = 'block';
+  document.getElementById('fc-nombre').value = '';
+  document.getElementById('fc-email').value = '';
+  document.getElementById('fc-mensaje').value = '';
+  btn.style.display = 'none';
+}
 </script>
 
 </body>
