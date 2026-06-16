@@ -682,7 +682,7 @@
     padding: 10px 18px; border-radius: 8px;
     font-size: 14px; font-weight: 500; border: none; cursor: pointer;
   }
-  .btn-detalle-senal {
+  .btn-detalle-senal, .btn-detalle-apartar {
     padding: 10px 18px; border-radius: 8px;
     background: var(--accent); color: #fff;
     font-size: 14px; font-weight: 500; border: none; cursor: pointer;
@@ -2007,9 +2007,9 @@ function abrirDetalle(c) {
           <div class="detalle-precio">${c.precio.toLocaleString('es-ES')} €</div>
           <div class="detalle-btns">
             <button class="btn-detalle-wa" id="det-wa">
-              ${WA_SVG} WhatsApp
+              ${WA_SVG} Preguntar
             </button>
-            ${c.estado !== 'vendida' ? `<button class="btn-detalle-senal" id="det-senal">🔒 Reservar con 200 €</button>` : ''}
+            ${c.estado !== 'vendida' ? `<button class="btn-detalle-apartar" id="det-apartar">🔒 Quiero apartarla</button>` : ''}
           </div>
         </div>
       </div>
@@ -2042,7 +2042,12 @@ function abrirDetalle(c) {
 
   // Botones acción
   document.getElementById('det-wa').onclick = () => window.open(waLink(c), '_blank');
-  document.getElementById('det-senal')?.addEventListener('click', () => { cerrar(); abrirModalSenal(c); });
+  document.getElementById('det-apartar')?.addEventListener('click', () => {
+    const msg = encodeURIComponent(
+      `Hola, me interesa apartar la ${c.marca} (${c.año}) · ${c.plazas} plazas · ${c.precio.toLocaleString('es-ES')} € que vi en vuestra web. ¿Está disponible?`
+    );
+    window.open(`https://wa.me/${WA_NUMERO}?text=${msg}`, '_blank');
+  });
 }
 
 function addDetalleButtons() {
