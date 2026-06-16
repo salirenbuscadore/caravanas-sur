@@ -273,26 +273,26 @@
     align-items: start;
   }
   .footer-left { display: flex; flex-direction: column; gap: 6px; }
-  .footer-brand { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; }
-  .footer-brand span { color: var(--accent); }
-  .footer-desc { font-size: 12px; color: var(--ink3); max-width: 340px; line-height: 1.6; }
-  .footer-legal { font-size: 11px; color: var(--ink3); margin-top: 4px; }
-  .footer-social { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-  .footer-social-title { font-size: 11px; color: var(--ink3); letter-spacing: 0.06em; text-transform: uppercase; }
+  .footer-brand { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: #F1EFE8; }
+  .footer-brand span { color: #E8956D; }
+  .footer-desc { font-size: 12px; color: #9E9C96; max-width: 340px; line-height: 1.6; }
+  .footer-legal { font-size: 11px; color: #6E6C67; margin-top: 4px; }
+  .footer-social { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .footer-social-title { font-size: 11px; color: #9E9C96; letter-spacing: 0.06em; text-transform: uppercase; }
   .social-links { display: flex; gap: 8px; }
   .social-link {
     display: flex; align-items: center; gap: 6px;
-    font-size: 12px; color: var(--ink2);
-    padding: 6px 12px; border-radius: 8px;
-    border: 1px solid var(--border); background: transparent;
+    font-size: 12px;
+    padding: 8px 16px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
     transition: all 0.15s; text-decoration: none;
   }
-  .social-link:hover { border-color: var(--ink); color: var(--ink); background: var(--bg2); }
+  .social-link:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
   .social-link svg { width: 14px; height: 14px; flex-shrink: 0; }
-  .social-link.ig { color: #833AB4; border-color: rgba(131,58,180,0.25); }
-  .social-link.ig:hover { background: rgba(131,58,180,0.08); border-color: #833AB4; }
-  .social-link.wp { color: #59BFC2; border-color: rgba(89,191,194,0.25); }
-  .social-link.wp:hover { background: rgba(89,191,194,0.08); border-color: #59BFC2; }
+  .social-link.ig { color: #C77DFF; border-color: rgba(199,125,255,0.3); }
+  .social-link.ig:hover { background: rgba(199,125,255,0.1); border-color: #C77DFF; }
+  .social-link.wp { color: #59BFC2; border-color: rgba(89,191,194,0.3); }
+  .social-link.wp:hover { background: rgba(89,191,194,0.1); border-color: #59BFC2; }
   @media (max-width: 600px) {
     footer { grid-template-columns: 1fr; }
     .footer-social { align-items: flex-start; }
@@ -1261,7 +1261,7 @@
   </div>
 </section>
 
-<footer>
+<footer style="background:#2C2C2A;">
   <div class="footer-left">
     <div class="footer-brand">Caravanas<span>Sur</span></div>
     <p class="footer-desc">Caravanas francesas de ocasión en Andalucía. Entrega en Málaga y Granada. Todas &lt; 750 kg, sin ITV propia, documentación incluida.</p>
@@ -1269,7 +1269,7 @@
   </div>
   <div class="footer-social">
     <span class="footer-social-title">Síguenos</span>
-    <div class="social-links">
+    <div class="social-links" style="padding-bottom:70px;">
       <a class="social-link ig" href="https://www.instagram.com/caravanassur" target="_blank" rel="noopener" aria-label="Instagram Caravanas Sur">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
         @caravanassur
