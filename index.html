@@ -1647,7 +1647,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 
 /* ── AVÍSAME → GOOGLE SHEETS ── */
 // ⚠️ Sustituye esta URL por la que te dé Apps Script al publicar
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxrEA9VLr6Iva6OYuO3Pj4z_3hhgZ35UCgTupElToJFZG3zwynA8VI74eipqkadRae2/exec";
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbybZWITX-1AyY37UUuNyeDQv6onIDjxO7Nx71Lqy7i_Q35rOvPelD-lCxNXZ_y95KPj/exec";
 
 document.getElementById('btn-avisame').addEventListener('click', async () => {
   const email  = document.getElementById('av-email').value.trim();
@@ -1861,7 +1861,7 @@ function abrirModalSenal(c) {
     }
     // Enviar al Sheet
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbxrEA9VLr6Iva6OYuO3Pj4z_3hhgZ35UCgTupElToJFZG3zwynA8VI74eipqkadRae2/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbybZWITX-1AyY37UUuNyeDQv6onIDjxO7Nx71Lqy7i_Q35rOvPelD-lCxNXZ_y95KPj/exec", {
         method: "POST", mode: "no-cors",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
