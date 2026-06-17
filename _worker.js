@@ -11,36 +11,29 @@ const JSON_FILE      = "caravanas.json";
 // Se llama GITHUB_TOKEN
 
 async function getCaravanas() {
-  const url = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/${JSON_FILE}?t=${Date.now()}`;
-  const res = await fetch(url);
-  return res.json();
+  const res = await fetch(
+    `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
+    { headers: { Authorization: "token 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", "User-Agent": "caravanas-sur" } }
+  );
+  const data = await res.json();
+  const decoded = atob(data.content.replace(/\n/g, ''));
+  return JSON.parse(new TextDecoder().decode(Uint8Array.from(decoded, c => c.charCodeAt(0))));
 }
 
 async function saveCaravanas(env, caravanas) {
-  // 1. Obtener SHA actual
   const shaRes = await fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
-    { headers: { Authorization: `token ${env.GITHUB_TOKEN}`, "User-Agent": "caravanas-sur" } }
+    { headers: { Authorization: "token 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", "User-Agent": "caravanas-sur" } }
   );
   const shaData = await shaRes.json();
   const sha = shaData.sha;
-
-  // 2. Subir nuevo contenido
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(caravanas, null, 2))));
+  const fileContent = btoa(unescape(encodeURIComponent(JSON.stringify(caravanas, null, 2))));
   await fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
     {
       method: "PUT",
-      headers: {
-        Authorization: `token ${env.GITHUB_TOKEN}`,
-        "Content-Type": "application/json",
-        "User-Agent": "caravanas-sur"
-      },
-      body: JSON.stringify({
-        message: "CMS: actualizar catálogo",
-        content,
-        sha
-      })
+      headers: { Authorization: "token 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", "Content-Type": "application/json", "User-Agent": "caravanas-sur" },
+      body: JSON.stringify({ message: "CMS: actualizar catálogo", content: fileContent, sha })
     }
   );
 }
@@ -64,9 +57,15 @@ function json(data, status = 200) {
 }
 
 async function fetchGitHub(path) {
-  const url = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/${path}?t=${Date.now()}`;
-  const res = await fetch(url);
-  return new Response(await res.text(), {
+  const res = await fetch(
+    `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`,
+    { headers: { Authorization: "token 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", "User-Agent": "caravanas-sur" } }
+  );
+  const data = await res.json();
+  const decoded = atob(data.content.replace(/\n/g, ''));
+  const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
+  const text = new TextDecoder().decode(bytes);
+  return new Response(text, {
     headers: { "Content-Type": path.endsWith(".html") ? "text/html;charset=UTF-8" : "application/octet-stream" }
   });
 }
@@ -280,20 +279,41 @@ function adminHTML() {
 </div>
 
 <script>
-let pwd = "";
+const ADMIN_PWD = "laurent2026";
+const GH_TOKEN = "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";
+const GH_REPO = "salirenbuscadore/caravanas-sur";
+const GH_FILE = "caravanas.json";
 let cars = [];
 
+async function ghGet() {
+  const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
+    headers: { Authorization: `token ${GH_TOKEN}` }
+  });
+  const data = await res.json();
+  const decoded = atob(data.content.replace(/\n/g, ''));
+  return JSON.parse(new TextDecoder().decode(Uint8Array.from(decoded, c => c.charCodeAt(0))));
+}
+
+async function ghSave(list) {
+  const meta = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
+    headers: { Authorization: `token ${GH_TOKEN}` }
+  }).then(r => r.json());
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
+  await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
+    method: "PUT",
+    headers: { Authorization: `token ${GH_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ message: "CMS: actualizar catálogo", content, sha: meta.sha })
+  });
+}
+
 function login() {
-  pwd = document.getElementById("pwd").value;
-  fetch("/api/admin/caravanas", { headers: { "X-Admin-Password": pwd } })
-    .then(r => { if (!r.ok) throw 0; return r.json(); })
-    .then(data => {
-      cars = data;
-      document.getElementById("login").style.display = "none";
-      document.getElementById("app").style.display = "block";
-      render();
-    })
-    .catch(() => { document.getElementById("login-err").style.display = "block"; });
+  const pwd = document.getElementById("pwd").value;
+  if (pwd !== ADMIN_PWD) {
+    document.getElementById("login-err").style.display = "block"; return;
+  }
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  ghGet().then(data => { cars = data; render(); });
 }
 
 function render() {
@@ -365,14 +385,13 @@ async function guardar() {
   const btn = document.getElementById("btn-guardar");
   btn.textContent = "Guardando..."; btn.classList.add("saving");
 
-  const url    = id ? \`/api/admin/caravanas/\${id}\` : "/api/admin/caravanas";
-  const method = id ? "PUT" : "POST";
-  await fetch(url, {
-    method,
-    headers: { "Content-Type": "application/json", "X-Admin-Password": pwd },
-    body: JSON.stringify(data)
-  });
-  cars = await fetch("/api/admin/caravanas", { headers: { "X-Admin-Password": pwd } }).then(r=>r.json());
+    if (id) {
+    cars = cars.map(c => c.id === id ? { ...data, id } : c);
+  } else {
+    data.id = Date.now().toString();
+    cars.push(data);
+  }
+  await ghSave(cars);
   render();
   cerrarModal();
   btn.textContent = "Guardar"; btn.classList.remove("saving");
@@ -380,8 +399,8 @@ async function guardar() {
 
 async function eliminar(id) {
   if (!confirm("¿Eliminar esta caravana?")) return;
-  await fetch(\`/api/admin/caravanas/\${id}\`, { method:"DELETE", headers:{"X-Admin-Password":pwd} });
-  cars = cars.filter(c=>c.id!==id);
+  cars = cars.filter(c => c.id !== id);
+  await ghSave(cars);
   render();
 }
 
