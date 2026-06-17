@@ -1338,7 +1338,7 @@ var CARAVANAS = [];
 
 async function cargarCatalogo() {
   try {
-    const res = await fetch('/api/caravanas');
+    const res = await fetch('https://raw.githubusercontent.com/salirenbuscadore/caravanas-sur/main/caravanas.json?t=' + Date.now());
     CARAVANAS = await res.json();
   } catch(e) {
     CARAVANAS = [];
