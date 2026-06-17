@@ -1346,6 +1346,67 @@ async function cargarCatalogo() {
   renderCatalogo();
 }
 
+function renderCatalogo() {
+  if (!CARAVANAS.length) return;
+
+  // Inicializar slider precios
+  const precios = CARAVANAS.map(c => c.precio);
+  PRECIO_MIN = Math.min(...precios);
+  PRECIO_MAX = Math.max(...precios);
+  rangeEl.min   = PRECIO_MIN;
+  rangeEl.max   = PRECIO_MAX;
+  rangeEl.value = PRECIO_MAX;
+  rangeEl.step  = 100;
+  updateFill(PRECIO_MAX);
+  displayEl.textContent = 'sin límite';
+
+  // Inicializar filtros de marca dinámicamente
+  const filtersWrap = document.getElementById('filters-wrap');
+  // Limpiar botones de marca previos (dejar los de estado)
+  filtersWrap.querySelectorAll('.marca-btn').forEach(b => b.remove());
+
+  const marcasCatalogo = [...new Set(CARAVANAS.map(c => c.marca.split(' ')[0].trim()))];
+  const MARCAS_SEO = ['Trigano', 'Sterckeman', 'Dethleffs'];
+  const marcasExtra = MARCAS_SEO.filter(m => !marcasCatalogo.includes(m));
+
+  marcasCatalogo.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn marca-btn';
+    btn.dataset.filter = m;
+    btn.dataset.type = 'marca';
+    btn.textContent = m;
+    filtersWrap.appendChild(btn);
+  });
+
+  marcasExtra.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn marca-btn proximamente';
+    btn.dataset.filter = m;
+    btn.dataset.type = 'marca';
+    btn.title = m + ' — próximamente';
+    btn.innerHTML = m + ' <span style="opacity:.6;font-size:11px">· pronto</span>';
+    filtersWrap.appendChild(btn);
+  });
+
+  // Re-bind filtros
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tipo = btn.dataset.type;
+      if (tipo === 'estado') {
+        document.querySelectorAll('.filter-btn[data-type="estado"]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        render(btn.dataset.filter, undefined, undefined);
+      } else if (tipo === 'marca') {
+        document.querySelectorAll('.filter-btn[data-type="marca"]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        render(undefined, undefined, btn.dataset.filter);
+      }
+    });
+  });
+
+  render('todas', PRECIO_MAX, 'todas');
+}
+
 /* ═══════════════════════════════════════════════════════════════
    MOTOR — no toques nada de aquí abajo
 ═══════════════════════════════════════════════════════════════ */
@@ -1438,18 +1499,12 @@ function goTo(id, i) {
 }
 
 /* ── PRECIO SLIDER ── */
-const precios = CARAVANAS.map(c => c.precio);
-const PRECIO_MIN = Math.min(...precios);
-const PRECIO_MAX = Math.max(...precios);
+var PRECIO_MIN = 0;
+var PRECIO_MAX = 10000;
 const rangeEl   = document.getElementById('price-slider');
 const fillEl    = document.getElementById('range-fill');
 const displayEl = document.getElementById('price-display');
 const countEl   = document.getElementById('result-count');
-
-rangeEl.min   = PRECIO_MIN;
-rangeEl.max   = PRECIO_MAX;
-rangeEl.value = PRECIO_MAX;
-rangeEl.step  = 100;
 
 function updateFill(val) {
   const pct = Math.round(((val - PRECIO_MIN) / (PRECIO_MAX - PRECIO_MIN)) * 100);
@@ -1524,33 +1579,7 @@ document.getElementById('wa-entrega').href =
   `https://wa.me/${WA_NUMERO}?text=${encodeURIComponent('Hola, quería consultar si hacéis entrega en mi zona (Málaga/Granada).')}`;
 
 
-/* ── FILTROS POR MARCA (catálogo real + marcas SEO "próximamente") ── */
-const marcasCatalogo = [...new Set(CARAVANAS.map(c => c.marca.split(' ')[0].trim()))];
-
-// Marcas muy buscadas en España que aún no tenemos en stock — SEO + "avísame"
-const MARCAS_SEO = ['Trigano', 'Sterckeman', 'Dethleffs'];
-const marcasExtra = MARCAS_SEO.filter(m => !marcasCatalogo.includes(m));
-
-const filtersWrap = document.getElementById('filters-wrap');
-
-marcasCatalogo.forEach(m => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn marca-btn';
-  btn.dataset.filter = m;
-  btn.dataset.type = 'marca';
-  btn.textContent = m;
-  filtersWrap.appendChild(btn);
-});
-
-marcasExtra.forEach(m => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn marca-btn proximamente';
-  btn.dataset.filter = m;
-  btn.dataset.type = 'marca';
-  btn.title = `${m} — próximamente, apúntate para que te avisemos`;
-  btn.innerHTML = `${m} <span style="opacity:.6;font-size:11px">· pronto</span>`;
-  filtersWrap.appendChild(btn);
-});
+/* ── FILTROS DE MARCA — gestionados en renderCatalogo() ── */
 
 let activoEstado = 'todas';
 let activaMarca  = 'todas';
