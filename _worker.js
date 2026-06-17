@@ -286,8 +286,8 @@ const GH_FILE = "caravanas.json";
 let cars = [];
 
 async function ghGet() {
-  const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
-    headers: { Authorization: `token ${GH_TOKEN}` }
+  const res = await fetch(\`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}\`, {
+    headers: { Authorization: \`token ${GH_TOKEN}\` }
   });
   const data = await res.json();
   const decoded = atob(data.content.replace(/\n/g, ''));
@@ -295,13 +295,13 @@ async function ghGet() {
 }
 
 async function ghSave(list) {
-  const meta = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
-    headers: { Authorization: `token ${GH_TOKEN}` }
+  const meta = await fetch(\`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}\`, {
+    headers: { Authorization: \`token ${GH_TOKEN}\` }
   }).then(r => r.json());
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
-  await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
+  await fetch(\`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}\`, {
     method: "PUT",
-    headers: { Authorization: `token ${GH_TOKEN}`, "Content-Type": "application/json" },
+    headers: { Authorization: \`token ${GH_TOKEN}\`, "Content-Type": "application/json" },
     body: JSON.stringify({ message: "CMS: actualizar catálogo", content, sha: meta.sha })
   });
 }
@@ -319,7 +319,7 @@ function login() {
 function render() {
   const el = document.getElementById("lista");
   if (!cars.length) { el.innerHTML = '<p style="color:#888;font-size:14px">Sin caravanas. Añade la primera.</p>'; return; }
-  el.innerHTML = cars.map(c => \`
+  el.innerHTML = cars.map(c => \\`
     <div class="car-card">
       <img class="car-foto" src="\${c.fotos?.[0]||''}" onerror="this.style.background='#eee'" alt="">
       <div class="car-info">
@@ -332,7 +332,7 @@ function render() {
         <button class="btn btn-sm btn-danger" onclick="eliminar('\${c.id}')">Eliminar</button>
       </div>
     </div>
-  \`).join('');
+  \\`).join('');
 }
 
 function abrirModal(c) {
@@ -361,7 +361,7 @@ function editar(id) { abrirModal(cars.find(c => c.id === id)); }
 function previewFotos() {
   const urls = document.getElementById("f-fotos").value.split("\\n").map(u=>u.trim()).filter(Boolean);
   document.getElementById("foto-preview").innerHTML = urls.map(u =>
-    \`<img src="\${u}" onerror="this.style.background='#eee'" alt="">\`
+    \\`<img src="\${u}" onerror="this.style.background='#eee'" alt="">\\`
   ).join('');
 }
 
