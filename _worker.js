@@ -45,6 +45,17 @@ async function saveCaravanas(env, caravanas) {
   );
 }
 
+async function syncSheet(caravanas) {
+  const WEBHOOK = "https://script.google.com/macros/s/AKfycbybZWITX-1AyY37UUuNyeDQv6onIDjxO7Nx71Lqy7i_Q35rOvPelD-lCxNXZ_y95KPj/exec";
+  try {
+    await fetch(WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tipo: "catalogo", caravanas })
+    });
+  } catch(e) { console.log("Sheet sync error:", e); }
+}
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -94,6 +105,7 @@ export default {
         body.id = Date.now().toString();
         list.push(body);
         await saveCaravanas(env, list);
+        await syncSheet(list);
         return json({ ok: true, id: body.id });
       }
 
@@ -104,6 +116,7 @@ export default {
         let list   = await getCaravanas();
         list       = list.map(c => c.id === id ? { ...body, id } : c);
         await saveCaravanas(env, list);
+        await syncSheet(list);
         return json({ ok: true });
       }
 
@@ -113,6 +126,7 @@ export default {
         let list = await getCaravanas();
         list     = list.filter(c => c.id !== id);
         await saveCaravanas(env, list);
+        await syncSheet(list);
         return json({ ok: true });
       }
     }
