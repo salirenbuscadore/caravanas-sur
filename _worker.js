@@ -247,7 +247,23 @@ function adminHTML() {
         </select>
       </div>
     </div>
-    <div class="form-group"><label>Extras (separados por comas)</label><input id="f-extras" placeholder="Toldo, Nevera, Mover"></div>
+    <div class="form-group">
+      <label>Extras</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;" id="extras-checks">
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Toldo"> Toldo</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Nevera"> Nevera</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Mover"> Mover</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Calefacción"> Calefacción</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Baño"> Baño</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="TV"> TV</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="A/C"> A/C</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Despertador solar"> Despertador solar</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Estabilizadores"> Estabilizadores</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Panel solar"> Panel solar</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Baca"> Baca</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="Ducha exterior"> Ducha exterior</label>
+      </div>
+    </div>
     <div class="form-group"><label>Descripción</label><textarea id="f-desc" placeholder="Estado general, detalles..."></textarea></div>
     <div class="form-group">
       <label>URLs de fotos (una por línea)</label>
@@ -308,7 +324,10 @@ function abrirModal(c) {
   document.getElementById("f-peso").value   = c?.peso||"";
   document.getElementById("f-precio").value = c?.precio||"";
   document.getElementById("f-estado").value = c?.estado||"disponible";
-  document.getElementById("f-extras").value = (c?.extras||[]).join(", ");
+  // Marcar checkboxes de extras
+  document.querySelectorAll('#extras-checks input[type=checkbox]').forEach(cb => {
+    cb.checked = (c?.extras||[]).includes(cb.value);
+  });
   document.getElementById("f-desc").value   = c?.descripcion||"";
   document.getElementById("f-fotos").value  = (c?.fotos||[]).join("\\n");
   document.getElementById("form-err").style.display = "none";
@@ -339,7 +358,7 @@ async function guardar() {
     plazas:      parseInt(document.getElementById("f-plazas").value)||4,
     peso:        document.getElementById("f-peso").value.trim(),
     estado:      document.getElementById("f-estado").value,
-    extras:      document.getElementById("f-extras").value.split(",").map(e=>e.trim()).filter(Boolean),
+    extras:      [...document.querySelectorAll('#extras-checks input[type=checkbox]:checked')].map(cb=>cb.value),
     descripcion: document.getElementById("f-desc").value.trim(),
     fotos:       document.getElementById("f-fotos").value.split("\\n").map(u=>u.trim()).filter(Boolean),
   };
