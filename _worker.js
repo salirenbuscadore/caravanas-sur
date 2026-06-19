@@ -7,13 +7,21 @@ const GITHUB_REPO    = "salirenbuscadore/caravanas-sur";
 const GITHUB_BRANCH  = "main";
 const JSON_FILE      = "caravanas.json";
 
-// Token GitHub guardado como variable de entorno en Cloudflare
-// Se llama GITHUB_TOKEN
+// El token de GitHub se lee de la variable de entorno GITHUB_TOKEN
+// configurada en Cloudflare (Settings → Variables y secretos).
+// Nunca debe estar escrito aquí en texto plano.
 
-async function getCaravanas() {
+function ghHeaders(env) {
+  return {
+    Authorization: `token ${env.GITHUB_TOKEN}`,
+    "User-Agent": "caravanas-sur"
+  };
+}
+
+async function getCaravanas(env) {
   const res = await fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
-    { headers: { Authorization: "token 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", "User-Agent": "caravanas-sur" } }
+    { headers: ghHeaders(env) }
   );
   const data = await res.json();
   const decoded = atob(data.content.replace(/\n/g, ''));
@@ -23,7 +31,7 @@ async function getCaravanas() {
 async function saveCaravanas(env, caravanas) {
   const shaRes = await fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
-    { headers: { Authorization: "token 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", "User-Agent": "caravanas-sur" } }
+    { headers: ghHeaders(env) }
   );
   const shaData = await shaRes.json();
   const sha = shaData.sha;
@@ -32,8 +40,8 @@ async function saveCaravanas(env, caravanas) {
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
     {
       method: "PUT",
-      headers: { Authorization: "token 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", "Content-Type": "application/json", "User-Agent": "caravanas-sur" },
-      body: JSON.stringify({ message: "CMS: actualizar catálogo", content: fileContent, sha })
+      headers: { ...ghHeaders(env), "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "CMS: actualizar catálogo", content: fileContent, sha, branch: GITHUB_BRANCH })
     }
   );
 }
@@ -46,7 +54,7 @@ async function syncSheet(caravanas) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tipo: "catalogo", caravanas })
     });
-  } catch(e) { console.log("Sheet sync error:", e); }
+  } catch (e) { console.log("Sheet sync error:", e); }
 }
 
 function json(data, status = 200) {
@@ -56,10 +64,10 @@ function json(data, status = 200) {
   });
 }
 
-async function fetchGitHub(path) {
+async function fetchGitHub(env, path) {
   const res = await fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`,
-    { headers: { Authorization: "token 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", "User-Agent": "caravanas-sur" } }
+    { headers: ghHeaders(env) }
   );
   const data = await res.json();
   const decoded = atob(data.content.replace(/\n/g, ''));
@@ -83,7 +91,7 @@ export default {
 
     // ── API pública ────────────────────────────────────────
     if (path === "/api/caravanas" && method === "GET") {
-      const data = await getCaravanas();
+      const data = await getCaravanas(env);
       return json(data);
     }
 
@@ -94,13 +102,13 @@ export default {
 
       // GET lista
       if (path === "/api/admin/caravanas" && method === "GET") {
-        return json(await getCaravanas());
+        return json(await getCaravanas(env));
       }
 
       // POST nueva
       if (path === "/api/admin/caravanas" && method === "POST") {
         const body = await request.json();
-        const list = await getCaravanas();
+        const list = await getCaravanas(env);
         body.id = Date.now().toString();
         list.push(body);
         await saveCaravanas(env, list);
@@ -112,7 +120,7 @@ export default {
       if (path.startsWith("/api/admin/caravanas/") && method === "PUT") {
         const id   = path.split("/").pop();
         const body = await request.json();
-        let list   = await getCaravanas();
+        let list   = await getCaravanas(env);
         list       = list.map(c => c.id === id ? { ...body, id } : c);
         await saveCaravanas(env, list);
         await syncSheet(list);
@@ -122,7 +130,7 @@ export default {
       // DELETE eliminar
       if (path.startsWith("/api/admin/caravanas/") && method === "DELETE") {
         const id = path.split("/").pop();
-        let list = await getCaravanas();
+        let list = await getCaravanas(env);
         list     = list.filter(c => c.id !== id);
         await saveCaravanas(env, list);
         await syncSheet(list);
@@ -138,11 +146,11 @@ export default {
     }
 
     // ── Páginas estáticas ──────────────────────────────────
-    if (path === "/" || path === "/index.html") return fetchGitHub("index.html");
-    if (path === "/vendeurs.html")              return fetchGitHub("vendeurs.html");
+    if (path === "/" || path === "/index.html") return fetchGitHub(env, "index.html");
+    if (path === "/vendeurs.html")              return fetchGitHub(env, "vendeurs.html");
 
     // ── Fotos desde GitHub ─────────────────────────────────
-    if (path.startsWith("/fotos/")) return fetchGitHub(path.slice(1));
+    if (path.startsWith("/fotos/")) return fetchGitHub(env, path.slice(1));
 
     return new Response("Not found", { status: 404 });
   }
@@ -280,30 +288,15 @@ function adminHTML() {
 
 <script>
 const ADMIN_PWD = "laurent2026";
-const GH_TOKEN = "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";
-const GH_REPO = "salirenbuscadore/caravanas-sur";
-const GH_FILE = "caravanas.json";
 let cars = [];
 
-async function ghGet() {
-  const res = await fetch(\`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}\`, {
-    headers: { Authorization: \`token ${GH_TOKEN}\` }
+async function apiCall(method, path, body) {
+  const res = await fetch(path, {
+    method,
+    headers: { "X-Admin-Password": ADMIN_PWD, "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined
   });
-  const data = await res.json();
-  const decoded = atob(data.content.replace(/\n/g, ''));
-  return JSON.parse(new TextDecoder().decode(Uint8Array.from(decoded, c => c.charCodeAt(0))));
-}
-
-async function ghSave(list) {
-  const meta = await fetch(\`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}\`, {
-    headers: { Authorization: \`token ${GH_TOKEN}\` }
-  }).then(r => r.json());
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
-  await fetch(\`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}\`, {
-    method: "PUT",
-    headers: { Authorization: \`token ${GH_TOKEN}\`, "Content-Type": "application/json" },
-    body: JSON.stringify({ message: "CMS: actualizar catálogo", content, sha: meta.sha })
-  });
+  return res.json();
 }
 
 function login() {
@@ -313,13 +306,13 @@ function login() {
   }
   document.getElementById("login").style.display = "none";
   document.getElementById("app").style.display = "block";
-  ghGet().then(data => { cars = data; render(); });
+  apiCall("GET", "/api/admin/caravanas").then(data => { cars = data; render(); });
 }
 
 function render() {
   const el = document.getElementById("lista");
   if (!cars.length) { el.innerHTML = '<p style="color:#888;font-size:14px">Sin caravanas. Añade la primera.</p>'; return; }
-  el.innerHTML = cars.map(c => \\`
+  el.innerHTML = cars.map(c => \`
     <div class="car-card">
       <img class="car-foto" src="\${c.fotos?.[0]||''}" onerror="this.style.background='#eee'" alt="">
       <div class="car-info">
@@ -332,7 +325,7 @@ function render() {
         <button class="btn btn-sm btn-danger" onclick="eliminar('\${c.id}')">Eliminar</button>
       </div>
     </div>
-  \\`).join('');
+  \`).join('');
 }
 
 function abrirModal(c) {
@@ -344,7 +337,6 @@ function abrirModal(c) {
   document.getElementById("f-peso").value   = c?.peso||"";
   document.getElementById("f-precio").value = c?.precio||"";
   document.getElementById("f-estado").value = c?.estado||"disponible";
-  // Marcar checkboxes de extras
   document.querySelectorAll('#extras-checks input[type=checkbox]').forEach(cb => {
     cb.checked = (c?.extras||[]).includes(cb.value);
   });
@@ -361,7 +353,7 @@ function editar(id) { abrirModal(cars.find(c => c.id === id)); }
 function previewFotos() {
   const urls = document.getElementById("f-fotos").value.split("\\n").map(u=>u.trim()).filter(Boolean);
   document.getElementById("foto-preview").innerHTML = urls.map(u =>
-    \\`<img src="\${u}" onerror="this.style.background='#eee'" alt="">\\`
+    \`<img src="\${u}" onerror="this.style.background='#eee'" alt="">\`
   ).join('');
 }
 
@@ -385,13 +377,12 @@ async function guardar() {
   const btn = document.getElementById("btn-guardar");
   btn.textContent = "Guardando..."; btn.classList.add("saving");
 
-    if (id) {
-    cars = cars.map(c => c.id === id ? { ...data, id } : c);
+  if (id) {
+    await apiCall("PUT", "/api/admin/caravanas/" + id, data);
   } else {
-    data.id = Date.now().toString();
-    cars.push(data);
+    await apiCall("POST", "/api/admin/caravanas", data);
   }
-  await ghSave(cars);
+  cars = await apiCall("GET", "/api/admin/caravanas");
   render();
   cerrarModal();
   btn.textContent = "Guardar"; btn.classList.remove("saving");
@@ -399,8 +390,8 @@ async function guardar() {
 
 async function eliminar(id) {
   if (!confirm("¿Eliminar esta caravana?")) return;
-  cars = cars.filter(c => c.id !== id);
-  await ghSave(cars);
+  await apiCall("DELETE", "/api/admin/caravanas/" + id);
+  cars = await apiCall("GET", "/api/admin/caravanas");
   render();
 }
 
