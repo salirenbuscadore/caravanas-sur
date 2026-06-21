@@ -37,21 +37,21 @@
     ]
   },
   {
-    "id": "3",
     "marca": "Hobby 440 SF",
     "año": 2008,
+    "precio": 5800,
     "plazas": 4,
     "peso": "740 kg",
-    "precio": 5800,
-    "estado": "reservada",
-    "fotos": [
-      "https://images.unsplash.com/photo-1563299796-17596ed6b017?w=800&q=80"
-    ],
-    "descripcion": "Reservada — disponible en 2–3 semanas.",
+    "estado": "vendida",
     "extras": [
       "Toldo",
       "Nevera",
       "A/C"
-    ]
+    ],
+    "descripcion": "Reservada — disponible en 2–3 semanas.",
+    "fotos": [
+      "https://images.unsplash.com/photo-1563299796-17596ed6b017?w=800&q=80"
+    ],
+    "id": "3"
   }
 ]
