@@ -25,11 +25,17 @@ async function getCaravanasPublic() {
 }
 
 async function getCaravanasAdmin(env) {
+  if (!env.GITHUB_TOKEN) {
+    throw new Error("GITHUB_TOKEN no está configurado en Cloudflare");
+  }
   const res = await fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
     { headers: ghHeaders(env) }
   );
   const data = await res.json();
+  if (!res.ok || !data.content) {
+    throw new Error("GitHub respondió: " + (data.message || res.status) + " (revisa que el token tenga permiso 'repo' y acceso a " + GITHUB_REPO + ")");
+  }
   const decoded = atob(data.content.replace(/\n/g, ''));
   return JSON.parse(new TextDecoder().decode(Uint8Array.from(decoded, c => c.charCodeAt(0))));
 }
