@@ -35,14 +35,20 @@ async function getCaravanasAdmin(env) {
 }
 
 async function saveCaravanas(env, caravanas) {
+  if (!env.GITHUB_TOKEN) {
+    throw new Error("GITHUB_TOKEN no configurado en Cloudflare (Settings → Variables y secretos)");
+  }
   const shaRes = await fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
     { headers: ghHeaders(env) }
   );
   const shaData = await shaRes.json();
+  if (!shaRes.ok || !shaData.sha) {
+    throw new Error("No se pudo leer el SHA del archivo: " + (shaData.message || shaRes.status));
+  }
   const sha = shaData.sha;
   const fileContent = btoa(unescape(encodeURIComponent(JSON.stringify(caravanas, null, 2))));
-  await fetch(
+  const putRes = await fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/contents/${JSON_FILE}`,
     {
       method: "PUT",
@@ -50,6 +56,10 @@ async function saveCaravanas(env, caravanas) {
       body: JSON.stringify({ message: "CMS: actualizar catálogo", content: fileContent, sha, branch: GITHUB_BRANCH })
     }
   );
+  if (!putRes.ok) {
+    const errData = await putRes.json().catch(()=>({}));
+    throw new Error("GitHub PUT falló: " + (errData.message || putRes.status));
+  }
 }
 
 async function syncSheet(caravanas) {
@@ -99,34 +109,38 @@ export default {
       const auth = request.headers.get("X-Admin-Password");
       if (auth !== ADMIN_PASSWORD) return json({ error: "Unauthorized" }, 401);
 
-      if (path === "/api/admin/caravanas" && method === "GET") {
-        return json(await getCaravanasAdmin(env));
-      }
-      if (path === "/api/admin/caravanas" && method === "POST") {
-        const body = await request.json();
-        const list = await getCaravanasAdmin(env);
-        body.id = Date.now().toString();
-        list.push(body);
-        await saveCaravanas(env, list);
-        await syncSheet(list);
-        return json({ ok: true, id: body.id });
-      }
-      if (path.startsWith("/api/admin/caravanas/") && method === "PUT") {
-        const id   = path.split("/").pop();
-        const body = await request.json();
-        let list   = await getCaravanasAdmin(env);
-        list       = list.map(c => c.id === id ? { ...body, id } : c);
-        await saveCaravanas(env, list);
-        await syncSheet(list);
-        return json({ ok: true });
-      }
-      if (path.startsWith("/api/admin/caravanas/") && method === "DELETE") {
-        const id = path.split("/").pop();
-        let list = await getCaravanasAdmin(env);
-        list     = list.filter(c => c.id !== id);
-        await saveCaravanas(env, list);
-        await syncSheet(list);
-        return json({ ok: true });
+      try {
+        if (path === "/api/admin/caravanas" && method === "GET") {
+          return json(await getCaravanasAdmin(env));
+        }
+        if (path === "/api/admin/caravanas" && method === "POST") {
+          const body = await request.json();
+          const list = await getCaravanasAdmin(env);
+          body.id = Date.now().toString();
+          list.push(body);
+          await saveCaravanas(env, list);
+          await syncSheet(list);
+          return json({ ok: true, id: body.id });
+        }
+        if (path.startsWith("/api/admin/caravanas/") && method === "PUT") {
+          const id   = path.split("/").pop();
+          const body = await request.json();
+          let list   = await getCaravanasAdmin(env);
+          list       = list.map(c => c.id === id ? { ...body, id } : c);
+          await saveCaravanas(env, list);
+          await syncSheet(list);
+          return json({ ok: true });
+        }
+        if (path.startsWith("/api/admin/caravanas/") && method === "DELETE") {
+          const id = path.split("/").pop();
+          let list = await getCaravanasAdmin(env);
+          list     = list.filter(c => c.id !== id);
+          await saveCaravanas(env, list);
+          await syncSheet(list);
+          return json({ ok: true });
+        }
+      } catch (err) {
+        return json({ error: err.message || "Error desconocido en el servidor" }, 500);
       }
     }
 
@@ -286,7 +300,12 @@ async function apiCall(method, path, body) {
     headers: { "X-Admin-Password": ADMIN_PWD, "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined
   });
-  return res.json();
+  let data;
+  try { data = await res.json(); } catch(e) { data = { error: "Respuesta inválida del servidor" }; }
+  if (!res.ok) {
+    throw new Error(data.error || ("Error HTTP " + res.status));
+  }
+  return data;
 }
 
 function login() {
@@ -367,14 +386,20 @@ async function guardar() {
   const btn = document.getElementById("btn-guardar");
   btn.textContent = "Guardando..."; btn.classList.add("saving");
 
-  if (id) {
-    await apiCall("PUT", "/api/admin/caravanas/" + id, data);
-  } else {
-    await apiCall("POST", "/api/admin/caravanas", data);
+  try {
+    if (id) {
+      await apiCall("PUT", "/api/admin/caravanas/" + id, data);
+    } else {
+      await apiCall("POST", "/api/admin/caravanas", data);
+    }
+    cars = await apiCall("GET", "/api/admin/caravanas");
+    render();
+    cerrarModal();
+  } catch (err) {
+    const errEl = document.getElementById("form-err");
+    errEl.textContent = "Error al guardar: " + err.message;
+    errEl.style.display = "block";
   }
-  cars = await apiCall("GET", "/api/admin/caravanas");
-  render();
-  cerrarModal();
   btn.textContent = "Guardar"; btn.classList.remove("saving");
 }
 
