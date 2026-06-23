@@ -1,5 +1,6 @@
 [
   {
+    "id": "1",
     "marca": "Caravelair Ariane 390",
     "año": 2004,
     "precio": 3200,
@@ -15,10 +16,10 @@
     "descripcion": "Caravana familiar en muy buen estado. Sin humedad verificada. Nevera trivalente, baño completo, toldo incluido.",
     "fotos": [
       "https://images.unsplash.com/photo-1533591380348-14193f1de18f?w=800&q=80"
-    ],
-    "id": "1"
+    ]
   },
   {
+    "id": "2",
     "marca": "Bürstner Premio 430",
     "año": 2006,
     "precio": 4100,
@@ -33,10 +34,10 @@
     "descripcion": "Bürstner alemana, calidad premium. Interior impecable, suelo sin puntos blandos.",
     "fotos": [
       "https://images.unsplash.com/photo-1478827536114-da961b7f86d2?w=800&q=80"
-    ],
-    "id": "2"
+    ]
   },
   {
+    "id": "3",
     "marca": "Hobby 440 SF",
     "año": 2008,
     "precio": 5800,
@@ -51,7 +52,45 @@
     "descripcion": "Reservada — disponible en 2–3 semanas.",
     "fotos": [
       "https://images.unsplash.com/photo-1563299796-17596ed6b017?w=800&q=80"
+    ]
+  },
+  {
+    "id": "4",
+    "marca": "Trigano Galleria 390",
+    "año": 2007,
+    "precio": 2800,
+    "plazas": 4,
+    "peso": "670 kg",
+    "estado": "disponible",
+    "extras": [
+      "Toldo",
+      "Nevera",
+      "Baño",
+      "Conexión 220V"
     ],
-    "id": "3"
+    "descripcion": "Caravana compacta y ligera, ideal para SUV o monovolumen. Procedente de Francia, revisada a fondo. Sin humedad, suelo firme. Perfecta para parejas o familias con niños pequeños. Entrega incluida en Málaga y Axarquía.",
+    "fotos": [
+      "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80"
+    ]
+  },
+  {
+    "id": "5",
+    "marca": "Adria Altea 432 PX",
+    "año": 2010,
+    "precio": 5200,
+    "plazas": 5,
+    "peso": "730 kg",
+    "estado": "disponible",
+    "extras": [
+      "Toldo eléctrico",
+      "Calefacción Truma",
+      "Nevera",
+      "Baño con ducha",
+      "TV"
+    ],
+    "descripcion": "Una de las mejores caravanas eslovenas del mercado, conocida por su construcción sólida y aislamiento de calidad. Esta unidad tiene solo 3 propietarios, historial de mantenimiento completo. Interior en excelente estado, tapicería sin manchas. Carta gris francesa incluida. Entrega gratuita en Granada y Costa Tropical.",
+    "fotos": [
+      "https://images.unsplash.com/photo-1571687949621-1bce16d66eef?w=800&q=80"
+    ]
   }
 ]
