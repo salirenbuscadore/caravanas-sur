@@ -74,7 +74,6 @@
     ]
   },
   {
-    "id": "5",
     "marca": "Adria Altea 432 PX",
     "año": 2010,
     "precio": 5200,
@@ -82,15 +81,15 @@
     "peso": "730 kg",
     "estado": "disponible",
     "extras": [
-      "Toldo eléctrico",
-      "Calefacción Truma",
       "Nevera",
-      "Baño con ducha",
-      "TV"
+      "TV",
+      "A/C",
+      "Baca"
     ],
     "descripcion": "Una de las mejores caravanas eslovenas del mercado, conocida por su construcción sólida y aislamiento de calidad. Esta unidad tiene solo 3 propietarios, historial de mantenimiento completo. Interior en excelente estado, tapicería sin manchas. Carta gris francesa incluida. Entrega gratuita en Granada y Costa Tropical.",
     "fotos": [
-      "https://images.unsplash.com/photo-1571687949621-1bce16d66eef?w=800&q=80"
-    ]
+      "https://images.unsplash.com/photo-1571687949621-1bce16d66eef"
+    ],
+    "id": "5"
   }
 ]
