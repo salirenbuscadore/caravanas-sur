@@ -193,11 +193,14 @@ export default {
         const rows = parsed.table.rows;
         const mensajes = rows.slice(0).map((row, i) => ({
           id: i,
+          fila: i + 2,
           fecha: row.c[0]?.v || "",
           de: row.c[1]?.v || "",
           asunto: row.c[2]?.v || "",
           mensaje: row.c[3]?.v || "",
-          estado: row.c[4]?.v || "Nuevo"
+          estado: row.c[4]?.v || "Nuevo",
+          nota: row.c[5]?.v || "",
+          link: row.c[6]?.v || ""
         }));
         return json(mensajes);
       } catch(e) {
