@@ -164,6 +164,23 @@ export default {
     if (path.startsWith("/fotos/")) return fetchPublic(path.slice(1));
 
 
+
+    // ── Actualizar estado de mensaje ───────────────────────
+    if (path === "/api/mensajes/estado" && method === "POST") {
+      const body = await request.json();
+      const WEBHOOK = "https://script.google.com/macros/s/AKfycbybZWITX-1AyY37UUuNyeDQv6onIDjxO7Nx71Lqy7i_Q35rOvPelD-lCxNXZ_y95KPj/exec";
+      try {
+        await fetch(WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tipo: "estado_mensaje", fila: body.fila, estado: body.estado })
+        });
+        return json({ ok: true });
+      } catch(e) {
+        return json({ ok: false, error: e.message });
+      }
+    }
+
     // ── Mensajes leboncoin (proxy Google Sheet) ────────────
     if (path === "/api/mensajes" && method === "GET") {
       const SHEET_ID = "1yCy5ckZk7hMWQkKfktd5qn0u_goFsNtv0yOSh57py94";
