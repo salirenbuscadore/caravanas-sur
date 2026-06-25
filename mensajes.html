@@ -9,7 +9,7 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
 
 .topbar { background: #1a1a1a; color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
-.topbar h1 { font-size: 16px; font-weight: 500; letter-spacing: 0.5px; }
+.topbar h1 { font-size: 16px; font-weight: 500; }
 .topbar a { color: #aaa; font-size: 13px; text-decoration: none; }
 .topbar a:hover { color: white; }
 
@@ -23,28 +23,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .col { background: #ebebeb; border-radius: 10px; padding: 14px; min-height: 300px; }
 
-.card { background: white; border-radius: 8px; padding: 14px; margin-bottom: 10px; border: 1px solid #e8e8e8; cursor: pointer; transition: box-shadow 0.15s; }
+.card { background: white; border-radius: 8px; padding: 14px; margin-bottom: 10px; border: 1px solid #e8e8e8; transition: box-shadow 0.15s; }
 .card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-.card-from { font-size: 13px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-.card-subject { font-size: 12px; color: #666; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-body { font-size: 12px; color: #888; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card-from { font-size: 13px; font-weight: 600; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; }
+.card-platform { font-size: 11px; color: #e85d26; font-weight: 500; }
+.card-subject { font-size: 11px; color: #999; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-body { font-size: 12px; color: #555; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; background: #f9f9f9; padding: 8px 10px; border-radius: 6px; border-left: 3px solid #e0e0e0; }
 .card-date { font-size: 11px; color: #bbb; margin-top: 10px; }
 .card-actions { display: flex; gap: 8px; margin-top: 10px; }
-.btn { font-size: 11px; padding: 4px 10px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; color: #444; }
-.btn:hover { background: #f5f5f5; }
+.btn { font-size: 11px; padding: 5px 11px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; color: #444; transition: background 0.1s; }
+.btn:hover { background: #f0f0f0; }
 .btn.primary { background: #1a1a1a; color: white; border-color: #1a1a1a; }
 .btn.primary:hover { background: #333; }
+.btn:disabled { opacity: 0.4; cursor: default; }
 
-.avatar { width: 28px; height: 28px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #555; flex-shrink: 0; }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: #e85d26; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; }
 
 .empty { text-align: center; color: #bbb; font-size: 13px; padding: 40px 0; }
-
 .loading { text-align: center; padding: 60px; color: #888; font-size: 14px; }
-
-.badge-nuevo { background: #fff3cd; color: #856404; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
-.badge-respondido { background: #d1ecf1; color: #0c5460; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
-.badge-cerrado { background: #e2e3e5; color: #383d41; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
 
 @media (max-width: 768px) {
   .board { grid-template-columns: 1fr; padding: 16px; }
@@ -71,54 +68,105 @@ async function cargar() {
     mensajes = data;
     renderBoard();
   } catch(e) {
-    document.getElementById("app").innerHTML = `<div class="loading">⚠️ Error cargando datos: ${e.message}</div>`;
+    document.getElementById("app").innerHTML = `<div class="loading">⚠️ Error: ${e.message}</div>`;
   }
 }
 
-function initials(email) {
-  const name = email.split("@")[0].replace(/[._]/g, " ");
-  return name.split(" ").map(w => w[0]).join("").toUpperCase().substring(0, 2);
+function extractSender(de, mensaje) {
+  // Try to extract real sender from forwarded message body
+  const match = mensaje.match(/De:\s*([^<\n]+?)(?:\s*(?:via|<))/i);
+  if (match) return match[1].trim();
+  // Fallback: use the "De" field but strip email
+  return de.replace(/<[^>]+>/, '').replace(/\s+/g, ' ').trim();
+}
+
+function extractMessage(mensaje) {
+  // Strip the forwarded message header, keep the actual message content
+  const parts = mensaje.split(/Bonjour [^,]+,/i);
+  if (parts.length > 1) {
+    return parts[parts.length - 1]
+      .replace(/\[image:[^\]]*\]/gi, '')
+      .replace(/\*([^*]+)/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .substring(0, 400);
+  }
+  return mensaje.replace(/[-]{5,}.*?[-]{5,}/gs, '').trim().substring(0, 400);
 }
 
 function formatDate(d) {
-  if (!d) return "";
+  if (!d) return '';
+  // Handle "6/24/2026 22:37:30" format
   const date = new Date(d);
-  return date.toLocaleDateString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  if (isNaN(date)) {
+    const m = d.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)/);
+    if (m) {
+      const d2 = new Date(m[3], m[1]-1, m[2], m[4], m[5]);
+      return d2.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
+    return d;
+  }
+  return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
-function cambiarEstado(id, nuevoEstado) {
-  mensajes[id].estado = nuevoEstado;
-  renderBoard();
-  // Aquí se podría hacer POST al sheet para persistir
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
+}
+
+async function cambiarEstado(id, nuevoEstado) {
+  const btn = document.querySelector(`[data-id="${id}"][data-estado="${nuevoEstado}"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+  
+  try {
+    const res = await fetch('/api/mensajes/estado', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fila: mensajes[id].fila, estado: nuevoEstado })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      mensajes[id].estado = nuevoEstado;
+      renderBoard();
+    }
+  } catch(e) {
+    // Fallback: update locally
+    mensajes[id].estado = nuevoEstado;
+    renderBoard();
+  }
 }
 
 function renderCard(m) {
-  const ini = initials(m.de);
-  const acciones = m.estado === "Nuevo"
-    ? `<button class="btn primary" onclick="cambiarEstado(${m.id},'Respondido')">Marcar respondido</button>
-       <button class="btn" onclick="cambiarEstado(${m.id},'Cerrado')">Cerrar</button>`
-    : m.estado === "Respondido"
-    ? `<button class="btn" onclick="cambiarEstado(${m.id},'Cerrado')">Cerrar</button>
-       <button class="btn" onclick="cambiarEstado(${m.id},'Nuevo')">Reabrir</button>`
-    : `<button class="btn" onclick="cambiarEstado(${m.id},'Nuevo')">Reabrir</button>`;
+  const sender = extractSender(m.de, m.mensaje);
+  const body = extractMessage(m.mensaje);
+  const ini = initials(sender);
+  const acciones = m.estado === 'Nuevo'
+    ? `<button class="btn primary" data-id="${m.id}" data-estado="Respondido" onclick="cambiarEstado(${m.id},'Respondido')">Marcar respondido</button>
+       <button class="btn" data-id="${m.id}" data-estado="Cerrado" onclick="cambiarEstado(${m.id},'Cerrado')">Cerrar</button>`
+    : m.estado === 'Respondido'
+    ? `<button class="btn" data-id="${m.id}" data-estado="Cerrado" onclick="cambiarEstado(${m.id},'Cerrado')">Cerrar</button>
+       <button class="btn" data-id="${m.id}" data-estado="Nuevo" onclick="cambiarEstado(${m.id},'Nuevo')">Reabrir</button>`
+    : `<button class="btn" data-id="${m.id}" data-estado="Nuevo" onclick="cambiarEstado(${m.id},'Nuevo')">Reabrir</button>`;
 
   return `
     <div class="card">
       <div class="card-from">
         <div class="avatar">${ini}</div>
-        <span>${m.de.split("@")[0]}</span>
+        <div>
+          <div>${sender}</div>
+          <div class="card-platform">via leboncoin</div>
+        </div>
       </div>
-      <div class="card-subject">${m.asunto}</div>
-      <div class="card-body">${m.mensaje}</div>
+      <div class="card-subject">${m.asunto.replace(/Fwd?:\s*/i,'').substring(0,80)}</div>
+      <div class="card-body">${body}</div>
       <div class="card-date">${formatDate(m.fecha)}</div>
       <div class="card-actions">${acciones}</div>
     </div>`;
 }
 
 function renderBoard() {
-  const cols = ["Nuevo", "Respondido", "Cerrado"];
-  const labels = { Nuevo: "🔔 Nuevo", Respondido: "💬 Respondido", Cerrado: "✅ Cerrado" };
-  const countClass = { Nuevo: "nuevo", Respondido: "respondido", Cerrado: "cerrado" };
+  const cols = ['Nuevo', 'Respondido', 'Cerrado'];
+  const labels = { Nuevo: '🔔 Nuevo', Respondido: '💬 Respondido', Cerrado: '✅ Cerrado' };
+  const countClass = { Nuevo: 'nuevo', Respondido: 'respondido', Cerrado: 'cerrado' };
 
   let html = '<div class="board">';
   cols.forEach(estado => {
@@ -129,12 +177,12 @@ function renderBoard() {
         <span class="count ${countClass[estado]}">${items.length}</span>
       </div>
       <div class="col">
-        ${items.length ? items.map(renderCard).join("") : '<div class="empty">Sin mensajes</div>'}
+        ${items.length ? items.map(renderCard).join('') : '<div class="empty">Sin mensajes</div>'}
       </div>
     </div>`;
   });
-  html += "</div>";
-  document.getElementById("app").innerHTML = html;
+  html += '</div>';
+  document.getElementById('app').innerHTML = html;
 }
 
 cargar();
