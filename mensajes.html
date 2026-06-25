@@ -29,7 +29,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .card-from { font-size: 13px; font-weight: 600; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; }
 .card-platform { font-size: 11px; color: #e85d26; font-weight: 500; }
 .card-subject { font-size: 11px; color: #999; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-body { font-size: 12px; color: #555; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; background: #f9f9f9; padding: 8px 10px; border-radius: 6px; border-left: 3px solid #e0e0e0; }
+.card-body { font-size: 12px; color: #555; line-height: 1.6; background: #f9f9f9; padding: 8px 10px; border-radius: 6px; border-left: 3px solid #e0e0e0; white-space: pre-wrap; word-break: break-word; }
+.card-body.collapsed { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.btn-toggle { font-size: 11px; color: #e85d26; background: none; border: none; cursor: pointer; padding: 4px 0; text-decoration: underline; }
 .card-date { font-size: 11px; color: #bbb; margin-top: 10px; }
 .card-actions { display: flex; gap: 8px; margin-top: 10px; }
 .btn { font-size: 11px; padding: 5px 11px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; color: #444; transition: background 0.1s; }
@@ -96,17 +98,15 @@ function extractMessage(mensaje) {
 
 function formatDate(d) {
   if (!d) return '';
-  // Handle "6/24/2026 22:37:30" format
-  const date = new Date(d);
-  if (isNaN(date)) {
-    const m = d.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)/);
-    if (m) {
-      const d2 = new Date(m[3], m[1]-1, m[2], m[4], m[5]);
-      return d2.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-    }
-    return d;
+  // Handle Google Sheets gviz format: Date(2026,5,24,22,37,30) — month is 0-indexed
+  const gviz = String(d).match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+)/);
+  if (gviz) {
+    const date = new Date(+gviz[1], +gviz[2], +gviz[3], +gviz[4], +gviz[5]);
+    return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
   }
-  return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const date = new Date(d);
+  if (!isNaN(date)) return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return d;
 }
 
 function initials(name) {
@@ -135,6 +135,18 @@ async function cambiarEstado(id, nuevoEstado) {
   }
 }
 
+function toggleBody(id) {
+  const el = document.getElementById('body-' + id);
+  const btn = el.nextElementSibling;
+  if (el.classList.contains('collapsed')) {
+    el.classList.remove('collapsed');
+    btn.textContent = 'Ocultar';
+  } else {
+    el.classList.add('collapsed');
+    btn.textContent = 'Ver mensaje completo';
+  }
+}
+
 function renderCard(m) {
   const sender = extractSender(m.de, m.mensaje);
   const body = extractMessage(m.mensaje);
@@ -157,7 +169,8 @@ function renderCard(m) {
         </div>
       </div>
       <div class="card-subject">${m.asunto.replace(/Fwd?:\s*/i,'').substring(0,80)}</div>
-      <div class="card-body">${body}</div>
+      <div class="card-body collapsed" id="body-${m.id}">${body}</div>
+      <button class="btn-toggle" onclick="toggleBody(${m.id})">Ver mensaje completo</button>
       <div class="card-date">${formatDate(m.fecha)}</div>
       <div class="card-actions">${acciones}</div>
     </div>`;
