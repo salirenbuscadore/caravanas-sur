@@ -163,6 +163,31 @@ export default {
     if (path === "/mensajes" || path === "/mensajes.html") return fetchPublic("mensajes.html");
     if (path.startsWith("/fotos/")) return fetchPublic(path.slice(1));
 
+
+    // ── Mensajes leboncoin (proxy Google Sheet) ────────────
+    if (path === "/api/mensajes" && method === "GET") {
+      const SHEET_ID = "1yCy5ckZk7hMWQkKfktd5qn0u_goFsNtv0yOSh57py94";
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=mensajes`;
+      const res = await fetch(url);
+      const text = await res.text();
+      try {
+        const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1];
+        const parsed = JSON.parse(jsonStr);
+        const rows = parsed.table.rows;
+        const mensajes = rows.slice(1).map((row, i) => ({
+          id: i,
+          fecha: row.c[0]?.v || "",
+          de: row.c[1]?.v || "",
+          asunto: row.c[2]?.v || "",
+          mensaje: row.c[3]?.v || "",
+          estado: row.c[4]?.v || "Nuevo"
+        }));
+        return json(mensajes);
+      } catch(e) {
+        return json({ error: "Error parseando Sheet: " + e.message }, 500);
+      }
+    }
+
     return new Response("Not found", { status: 404 });
   }
 };
