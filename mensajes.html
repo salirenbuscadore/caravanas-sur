@@ -63,11 +63,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <script>
 const SHEET_ID = "1yCy5ckZk7hMWQkKfktd5qn0u_goFsNtv0yOSh57py94";
 const SHEET_NAME = "mensajes";
-const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAMe}`;
+const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
 
 let mensajes = [];
 
-arync function cargar() {
+async function cargar() {
   try {
     const res = await fetch(API_URL);
     const text = await res.text();
