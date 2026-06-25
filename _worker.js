@@ -160,6 +160,7 @@ export default {
     // ── Páginas públicas (raw.githubusercontent, sin token) ─
     if (path === "/" || path === "/index.html") return fetchPublic("index.html");
     if (path === "/vendeurs.html" || path === "/vendeurs") return fetchPublic("vendeurs.html");
+    if (path === "/mensajes" || path === "/mensajes.html") return fetchPublic("mensajes.html");
     if (path.startsWith("/fotos/")) return fetchPublic(path.slice(1));
 
     return new Response("Not found", { status: 404 });
