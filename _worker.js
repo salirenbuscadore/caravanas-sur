@@ -174,7 +174,7 @@ export default {
         const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1];
         const parsed = JSON.parse(jsonStr);
         const rows = parsed.table.rows;
-        const mensajes = rows.slice(1).map((row, i) => ({
+        const mensajes = rows.slice(0).map((row, i) => ({
           id: i,
           fecha: row.c[0]?.v || "",
           de: row.c[1]?.v || "",
