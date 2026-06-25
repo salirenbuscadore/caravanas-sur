@@ -61,32 +61,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div id="app" class="loading">Cargando mensajes...</div>
 
 <script>
-const SHEET_ID = "1yCy5ckZk7hMWQkKfktd5qn0u_goFsNtv0yOSh57py94";
-const SHEET_NAME = "mensajes";
-const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
-
 let mensajes = [];
 
 async function cargar() {
   try {
-    const res = await fetch(API_URL);
-    const text = await res.text();
-    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
-    const rows = json.table.rows;
-    const cols = json.table.cols.map(c => c.label);
-
-    mensajes = rows.slice(1).map((row, i) => ({
-      id: i,
-      fecha: row.c[0]?.v || "",
-      de: row.c[1]?.v || "",
-      asunto: row.c[2]?.v || "",
-      mensaje: row.c[3]?.v || "",
-      estado: row.c[4]?.v || "Nuevo"
-    }));
-
+    const res = await fetch("/api/mensajes");
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    mensajes = data;
     renderBoard();
   } catch(e) {
-    document.getElementById("app").innerHTML = `<div class="loading">⚠️ Error cargando datos. Verifica que el Sheet es público o compártelo.</div>`;
+    document.getElementById("app").innerHTML = `<div class="loading">⚠️ Error cargando datos: ${e.message}</div>`;
   }
 }
 
