@@ -192,9 +192,7 @@ function adminHTML() {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#F5F2EC;color:#1C1A16}
-.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
-.login-box{background:#fff;border-radius:16px;padding:2rem;width:320px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
-.login-box h1{font-size:20px;margin-bottom:1rem}
+
 input,select,textarea{width:100%;padding:9px 11px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:10px}
 textarea{min-height:80px;resize:vertical;margin-bottom:0}
 .btn{padding:10px 20px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
@@ -293,16 +291,6 @@ label{font-size:12px;font-weight:500;color:#444;display:block;margin-bottom:3px}
 </style>
 </head>
 <body>
-
-<div class="login-wrap" id="login">
-  <div class="login-box">
-    <h1>🚐 Admin Caravanas Sur</h1>
-    <p style="font-size:13px;color:#666;margin-bottom:1rem">Contraseña para acceder</p>
-    <input type="password" id="pwd" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
-    <button class="btn btn-primary" onclick="login()">Entrar</button>
-    <p class="error" id="login-err">Contraseña incorrecta</p>
-  </div>
-</div>
 
 <div id="app">
   <div class="header">
@@ -404,7 +392,6 @@ let mensajes = [];
 let alertas = [];
 let filtroAlerta = 'todos';
 
-// ── AUTH ──────────────────────────────────────────────────
 async function apiCall(method, path, body) {
   const res = await fetch(path, {
     method,
@@ -417,13 +404,9 @@ async function apiCall(method, path, body) {
   return data;
 }
 
-function login() {
-  const pwd = document.getElementById("pwd").value;
-  if (pwd !== ADMIN_PWD) { document.getElementById("login-err").style.display = "block"; return; }
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
-  cargarCatalogo();
-}
+// Auto-load on start
+document.getElementById("app").style.display = "block";
+cargarCatalogo();
 
 // ── TABS ──────────────────────────────────────────────────
 function showTab(name) {
